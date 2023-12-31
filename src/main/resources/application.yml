@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+library:
+  available-fix:
+    enable: true
+  custom-fix:
+    enable: true
+
+url:
+   mavenClient: https://search.maven.org
+   osvClient: https://api.osv.dev
