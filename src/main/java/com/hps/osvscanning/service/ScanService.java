@@ -1,11 +1,14 @@
 package com.hps.osvscanning.service;
 
-import com.hps.osvscanning.model.VulnerabilityBulk;
 import com.hps.osvscanning.model.Library;
+import com.hps.osvscanning.model.response.ResponseResult;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface ScanService {
-    VulnerabilityBulk retrieve(Library libraryInfo);
+import java.util.List;
 
-    VulnerabilityBulk scan(MultipartFile file) throws Exception;
+public interface ScanService {
+    ResponseResult retrieve(Library libraryInfo);
+//    ResponseResult retrieveBatch(List<Library> libraryInfo);
+
+    ResponseResult scan(MultipartFile file, Boolean includeSafe) throws Exception;
 }

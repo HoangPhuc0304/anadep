@@ -1,7 +1,7 @@
 package com.hps.osvscanning.mapper;
 
 import com.hps.osvscanning.model.Library;
-import com.hps.osvscanning.model.LibraryVersion;
+import com.hps.osvscanning.model.osv.LibraryOSVRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,7 +14,7 @@ public abstract class LibraryMapper {
     @Mapping(target = "commit", ignore = true)
     @Mapping(target = "nextPageToken", ignore = true)
     @Mapping(target = "libraryEcosystem.purl", ignore = true)
-    public abstract LibraryVersion libraryToVersion(Library library);
+    public abstract LibraryOSVRequest libraryToOSVRequest(Library library);
 
     String getLibraryName(Library libraryInfo) {
         return libraryInfo.getGroupId() + ":" + libraryInfo.getArtifactId();

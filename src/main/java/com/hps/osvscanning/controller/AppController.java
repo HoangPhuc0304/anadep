@@ -1,7 +1,7 @@
 package com.hps.osvscanning.controller;
 
-import com.hps.osvscanning.model.VulnerabilityBulk;
 import com.hps.osvscanning.model.Library;
+import com.hps.osvscanning.model.response.ResponseResult;
 import com.hps.osvscanning.service.ScanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,13 +15,15 @@ public class AppController {
 
     @PostMapping("/api/retrieve")
     @ResponseStatus(HttpStatus.OK)
-    public VulnerabilityBulk scan(@RequestBody Library libraryInfo) {
+    public ResponseResult scan(@RequestBody Library libraryInfo) {
         return scanService.retrieve(libraryInfo);
     }
 
     @PostMapping("/api/scan")
     @ResponseStatus(HttpStatus.OK)
-    public VulnerabilityBulk scan(@RequestParam("file") MultipartFile file) throws Exception {
-        return scanService.scan(file);
+    public ResponseResult scan(@RequestParam("file") MultipartFile file,
+                               @RequestParam(value = "includeSafe", defaultValue = "true") Boolean includeSafe)
+            throws Exception {
+        return scanService.scan(file, includeSafe);
     }
 }
