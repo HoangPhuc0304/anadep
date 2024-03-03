@@ -1,0 +1,23 @@
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--header-height);
+    background-color: hsl(var(--background));
+    /* border-bottom: 1px solid hsl(var(--border)); */
+    padding: 0 var(--spacing-three-x);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}

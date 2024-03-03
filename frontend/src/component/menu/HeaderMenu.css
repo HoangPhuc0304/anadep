@@ -1,0 +1,5 @@
+.header-menu {
+    height: var(--header-height);
+    width: auto;
+    padding: var(--spacing-half-x);
+}

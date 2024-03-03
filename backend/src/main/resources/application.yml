@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+library:
+  available-fix:
+    enable: true
+  custom-fix:
+    enable: true
+
+url:
+  mavenClient: https://search.maven.org
+  osvClient: https://api.osv.dev
+  githubClient: https://api.github.com
+  uiClient: http://localhost:3000
+  osvStorage:
+    npm: https://www.googleapis.com/storage/v1/b/osv-vulnerabilities
+
+spring:
+  data:
+    mongodb:
+      uri:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  security:
+    user:
+      name:
+      password:
+

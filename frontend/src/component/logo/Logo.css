@@ -1,0 +1,10 @@
+#logo {
+    height: var(--header-height);
+    width: auto;
+    padding: var(--spacing-half-x);
+}
+
+#logo .logo-img {
+    height: 100%;
+    width: auto;
+}

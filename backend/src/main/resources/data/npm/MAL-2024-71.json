@@ -1,0 +1,67 @@
+{
+  "id": "MAL-2024-71",
+  "summary": "Malicious code in cordova-plugin-canvas (npm)",
+  "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: ghsa-malware (c72f98238b951534c1437dc8a7c3ee8ab8463beb50c44c59d07cccdd15829386)\nAny computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.\n",
+  "aliases": [
+    "GHSA-p74q-r367-wgj7"
+  ],
+  "modified": "2024-01-12T00:43:25.789906Z",
+  "published": "2024-01-11T04:52:44Z",
+  "database_specific": {
+    "malicious-packages-origins": [
+      {
+        "modified_time": "2024-01-11T04:52:44Z",
+        "import_time": "2024-01-12T00:25:32.717165216Z",
+        "id": "GHSA-p74q-r367-wgj7",
+        "ranges": [
+          {
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ],
+            "type": "SEMVER"
+          }
+        ],
+        "source": "ghsa-malware",
+        "sha256": "c72f98238b951534c1437dc8a7c3ee8ab8463beb50c44c59d07cccdd15829386"
+      }
+    ]
+  },
+  "references": [
+    {
+      "type": "ADVISORY",
+      "url": "https://github.com/advisories/GHSA-p74q-r367-wgj7"
+    }
+  ],
+  "affected": [
+    {
+      "package": {
+        "name": "cordova-plugin-canvas",
+        "ecosystem": "npm",
+        "purl": "pkg:npm/cordova-plugin-canvas"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            }
+          ]
+        }
+      ],
+      "database_specific": {
+        "cwes": [
+          {
+            "description": "The product contains code that appears to be malicious in nature.",
+            "cweId": "CWE-506",
+            "name": "Embedded Malicious Code"
+          }
+        ],
+        "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/cordova-plugin-canvas/MAL-2024-71.json"
+      }
+    }
+  ],
+  "schema_version": "1.6.0"
+}

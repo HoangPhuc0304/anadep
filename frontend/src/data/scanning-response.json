@@ -1,0 +1,769 @@
+{
+    "libraries": [
+        {
+            "groupId": "org.webjars",
+            "artifactId": "popper.js",
+            "version": "1.16.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.junit.jupiter",
+            "artifactId": "junit-jupiter-api",
+            "version": "5.9.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.fasterxml.jackson.module",
+            "artifactId": "jackson-module-parameter-names",
+            "version": "2.14.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-oauth2-core",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "net.minidev",
+            "artifactId": "accessors-smart",
+            "version": "2.4.8",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.apache.tomcat.embed",
+            "artifactId": "tomcat-embed-websocket",
+            "version": "10.1.5",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "jakarta.persistence",
+            "artifactId": "jakarta.persistence-api",
+            "version": "3.1.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.thymeleaf.extras",
+            "artifactId": "thymeleaf-extras-springsecurity6",
+            "version": "3.1.1.RELEASE",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.fasterxml.jackson.datatype",
+            "artifactId": "jackson-datatype-jsr310",
+            "version": "2.14.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.webjars",
+            "artifactId": "bootstrap",
+            "version": "4.6.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.mapstruct",
+            "artifactId": "mapstruct-processor",
+            "version": "1.5.3.Final",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.webjars",
+            "artifactId": "webjars-locator-core",
+            "version": "0.52",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-aop",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.junit.jupiter",
+            "artifactId": "junit-jupiter",
+            "version": "5.9.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-beans",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "io.jsonwebtoken",
+            "artifactId": "jjwt",
+            "version": "0.9.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-core",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.data",
+            "artifactId": "spring-data-commons",
+            "version": "3.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-autoconfigure",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "jakarta.xml.bind",
+            "artifactId": "jakarta.xml.bind-api",
+            "version": "4.0.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.apache.logging.log4j",
+            "artifactId": "log4j-api",
+            "version": "2.19.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.junit.platform",
+            "artifactId": "junit-platform-engine",
+            "version": "1.9.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.thymeleaf",
+            "artifactId": "thymeleaf-spring6",
+            "version": "3.1.1.RELEASE",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.hibernate.orm",
+            "artifactId": "hibernate-core",
+            "version": "6.1.6.Final",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-expression",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-context-support",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-security",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.antlr",
+            "artifactId": "antlr4-runtime",
+            "version": "4.10.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-test",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.fasterxml",
+            "artifactId": "classmate",
+            "version": "1.5.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-core",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.nimbusds",
+            "artifactId": "nimbus-jose-jwt",
+            "version": "9.24.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-json",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "jakarta.annotation",
+            "artifactId": "jakarta.annotation-api",
+            "version": "2.1.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.glassfish.jaxb",
+            "artifactId": "jaxb-core",
+            "version": "4.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-validation",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "jakarta.activation",
+            "artifactId": "jakarta.activation-api",
+            "version": "2.1.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.glassfish.jaxb",
+            "artifactId": "jaxb-runtime",
+            "version": "4.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "io.github.classgraph",
+            "artifactId": "classgraph",
+            "version": "4.8.147",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.thymeleaf",
+            "artifactId": "thymeleaf",
+            "version": "3.1.1.RELEASE",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-tx",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.eclipse.angus",
+            "artifactId": "angus-activation",
+            "version": "1.0.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.fasterxml.jackson.core",
+            "artifactId": "jackson-databind",
+            "version": "2.14.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.vaadin.external.google",
+            "artifactId": "android-json",
+            "version": "0.0.20131108.vaadin1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "net.bytebuddy",
+            "artifactId": "byte-buddy",
+            "version": "1.12.22",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.nimbusds",
+            "artifactId": "lang-tag",
+            "version": "1.7",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-jdbc",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-config",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-crypto",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.fasterxml.jackson.datatype",
+            "artifactId": "jackson-datatype-jdk8",
+            "version": "2.14.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "net.bytebuddy",
+            "artifactId": "byte-buddy-agent",
+            "version": "1.12.22",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-oauth2-resource-server",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.yaml",
+            "artifactId": "snakeyaml",
+            "version": "1.33",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.slf4j",
+            "artifactId": "slf4j-api",
+            "version": "2.0.6",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-mail",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "jakarta.transaction",
+            "artifactId": "jakarta.transaction-api",
+            "version": "2.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.github.stephenc.jcip",
+            "artifactId": "jcip-annotations",
+            "version": "1.0-1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.hamcrest",
+            "artifactId": "hamcrest",
+            "version": "2.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.sun.istack",
+            "artifactId": "istack-commons-runtime",
+            "version": "4.1.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.assertj",
+            "artifactId": "assertj-core",
+            "version": "3.23.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-web",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-data-jpa",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "ch.qos.logback",
+            "artifactId": "logback-core",
+            "version": "1.4.5",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.hibernate.validator",
+            "artifactId": "hibernate-validator",
+            "version": "8.0.0.Final",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "ch.qos.logback",
+            "artifactId": "logback-classic",
+            "version": "1.4.5",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "jakarta.inject",
+            "artifactId": "jakarta.inject-api",
+            "version": "2.0.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-thymeleaf",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.mysql",
+            "artifactId": "mysql-connector-j",
+            "version": "8.0.32",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-test-autoconfigure",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.attoparser",
+            "artifactId": "attoparser",
+            "version": "2.0.6.RELEASE",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-tomcat",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.glassfish.jaxb",
+            "artifactId": "txw2",
+            "version": "4.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.jboss.logging",
+            "artifactId": "jboss-logging",
+            "version": "3.5.0.Final",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-oauth2-client",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "net.minidev",
+            "artifactId": "json-smart",
+            "version": "2.4.8",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.unbescape",
+            "artifactId": "unbescape",
+            "version": "1.1.6.RELEASE",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-orm",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.nimbusds",
+            "artifactId": "content-type",
+            "version": "2.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.mockito",
+            "artifactId": "mockito-core",
+            "version": "4.8.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.nimbusds",
+            "artifactId": "oauth2-oidc-sdk",
+            "version": "9.43.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-context",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.projectlombok",
+            "artifactId": "lombok",
+            "version": "1.18.24",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-test",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.xmlunit",
+            "artifactId": "xmlunit-core",
+            "version": "2.9.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-web",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.junit.jupiter",
+            "artifactId": "junit-jupiter-params",
+            "version": "5.9.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "io.micrometer",
+            "artifactId": "micrometer-commons",
+            "version": "1.10.3",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "javax.xml.bind",
+            "artifactId": "jaxb-api",
+            "version": "2.3.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-oauth2-client",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.junit.jupiter",
+            "artifactId": "junit-jupiter-engine",
+            "version": "5.9.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-jcl",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.opentest4j",
+            "artifactId": "opentest4j",
+            "version": "1.2.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.jayway.jsonpath",
+            "artifactId": "json-path",
+            "version": "2.7.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.mapstruct",
+            "artifactId": "mapstruct",
+            "version": "1.5.3.Final",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.apache.logging.log4j",
+            "artifactId": "log4j-to-slf4j",
+            "version": "2.19.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.hibernate.common",
+            "artifactId": "hibernate-commons-annotations",
+            "version": "6.0.2.Final",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "jakarta.validation",
+            "artifactId": "jakarta.validation-api",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.fasterxml.jackson.core",
+            "artifactId": "jackson-annotations",
+            "version": "2.14.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-web",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.eclipse.angus",
+            "artifactId": "jakarta.mail",
+            "version": "1.0.0",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.jboss",
+            "artifactId": "jandex",
+            "version": "2.4.2.Final",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-test",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "io.micrometer",
+            "artifactId": "micrometer-observation",
+            "version": "1.10.3",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.security",
+            "artifactId": "spring-security-oauth2-jose",
+            "version": "6.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.data",
+            "artifactId": "spring-data-jpa",
+            "version": "3.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.junit.platform",
+            "artifactId": "junit-platform-commons",
+            "version": "1.9.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.slf4j",
+            "artifactId": "jul-to-slf4j",
+            "version": "2.0.6",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-aop",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-aspects",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.webjars",
+            "artifactId": "jquery",
+            "version": "3.6.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.apiguardian",
+            "artifactId": "apiguardian-api",
+            "version": "1.1.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.objenesis",
+            "artifactId": "objenesis",
+            "version": "3.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.zaxxer",
+            "artifactId": "HikariCP",
+            "version": "5.0.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.apache.tomcat.embed",
+            "artifactId": "tomcat-embed-el",
+            "version": "10.1.5",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-webmvc",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.aspectj",
+            "artifactId": "aspectjweaver",
+            "version": "1.9.19",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.mockito",
+            "artifactId": "mockito-junit-jupiter",
+            "version": "4.8.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.skyscreamer",
+            "artifactId": "jsonassert",
+            "version": "1.5.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.ow2.asm",
+            "artifactId": "asm",
+            "version": "9.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework",
+            "artifactId": "spring-test",
+            "version": "6.0.4",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-oauth2-resource-server",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-logging",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "com.fasterxml.jackson.core",
+            "artifactId": "jackson-core",
+            "version": "2.14.1",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.springframework.boot",
+            "artifactId": "spring-boot-starter-jdbc",
+            "version": "3.0.2",
+            "ecosystem": "Maven"
+        },
+        {
+            "groupId": "org.apache.tomcat.embed",
+            "artifactId": "tomcat-embed-core",
+            "version": "10.1.5",
+            "ecosystem": "Maven"
+        }
+    ],
+    "ecosystem": "Maven",
+    "libraryCount": 127,
+    "responseTime": 4489
+}

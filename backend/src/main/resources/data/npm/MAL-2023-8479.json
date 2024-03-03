@@ -1,0 +1,67 @@
+{
+  "id": "MAL-2023-8479",
+  "summary": "Malicious code in rb-seatlayout-canvas (npm)",
+  "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: ghsa-malware (ab7073e8386662ab584a412e7d011050e505dea8df14c0e5273606bf0a823ae1)\nAny computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.\n",
+  "aliases": [
+    "GHSA-vmx9-79v8-2wgj"
+  ],
+  "modified": "2023-11-08T04:23:21.144635Z",
+  "published": "2023-11-07T11:14:42Z",
+  "database_specific": {
+    "malicious-packages-origins": [
+      {
+        "modified_time": "2023-11-07T11:14:43Z",
+        "import_time": "2023-11-08T00:24:33.5399279Z",
+        "id": "GHSA-vmx9-79v8-2wgj",
+        "ranges": [
+          {
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ],
+            "type": "SEMVER"
+          }
+        ],
+        "source": "ghsa-malware",
+        "sha256": "ab7073e8386662ab584a412e7d011050e505dea8df14c0e5273606bf0a823ae1"
+      }
+    ]
+  },
+  "references": [
+    {
+      "type": "ADVISORY",
+      "url": "https://github.com/advisories/GHSA-vmx9-79v8-2wgj"
+    }
+  ],
+  "affected": [
+    {
+      "package": {
+        "name": "rb-seatlayout-canvas",
+        "ecosystem": "npm",
+        "purl": "pkg:npm/rb-seatlayout-canvas"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            }
+          ]
+        }
+      ],
+      "database_specific": {
+        "cwes": [
+          {
+            "description": "The product contains code that appears to be malicious in nature.",
+            "cweId": "CWE-506",
+            "name": "Embedded Malicious Code"
+          }
+        ],
+        "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/rb-seatlayout-canvas/MAL-2023-8479.json"
+      }
+    }
+  ],
+  "schema_version": "1.6.0"
+}

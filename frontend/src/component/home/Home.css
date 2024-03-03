@@ -1,0 +1,67 @@
+.home {
+    display: block;
+    text-align: center;
+}
+
+.home-header-text {
+    margin: var(--font-text-xl) 0;
+}
+
+.home-header-text h1 {
+    font-size: var(--font-heading);
+    font-weight: 700;
+}
+
+.home-header-text h4 {
+    font-size: var(--font-text-xl);
+}
+
+.home-content {
+}
+
+.home-content {
+}
+
+.home-search-box {
+    position: relative;
+    display: inline-block;
+    width: 80%;
+}
+
+.home-search-icon {
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.home-search-input {
+    padding-left: 4rem;
+}
+
+.home-footer {
+}
+
+.shadow {
+    position: absolute;
+    background: hsl(var(--primary) / 0%);
+    border-radius: 24px;
+    rotate: 35deg;
+
+    width: 260px;
+    top: 200px;
+    height: 400px;
+    filter: blur(200px);
+    animation: shadow-slide infinite 4s linear alternate;
+}
+
+@keyframes shadow-slide {
+    from {
+        background: hsl(var(--primary) / 40%);
+        right: 460px;
+    }
+    to {
+        background: hsl(var(--primary) / 80%);
+        right: 160px;
+    }
+}

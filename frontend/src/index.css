@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 47.4% 11.2%;
+
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 47.4% 11.2%;
+
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 47.4% 11.2%;
+
+        --primary: 222.2 47.4% 11.2%;
+        --primary-foreground: 210 40% 98%;
+
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+
+        --destructive: 0 100% 50%;
+        --destructive-foreground: 210 40% 98%;
+
+        --ring: 215 20.2% 65.1%;
+
+        --radius: 0.5rem;
+
+        --font-text-xxm: 11px;
+        --font-text-xm: 12px;
+        --font-text-sm: 14px;
+        --font-text-md: 16px;
+        --font-text-lg: 20px;
+        --font-text-xl: 24px;
+        --font-heading: 48px;
+        --font-weight-lg: 550;
+        --font-weight-xl: 700;
+        --header-height: 56px;
+        --background-profile-height: 240px;
+        --avatar-profile-height: 136px;
+        --side-width: calc(100% * 3 / 10);
+        --page-width: calc(100% * 2 / 3);
+        --spacing-half-x: 0.4rem;
+        --spacing-one-x: 0.8rem;
+        --spacing-one-and-a-half-x: 1.2rem;
+        --spacing-two-x: 1.6rem;
+        --spacing-three-x: 2.4rem;
+        --spacing-four-x: 3.2rem;
+        --border-square-picture: 0.5rem;
+        --border-square-button: 40px;
+    }
+
+    .dark {
+        --background: 224 71% 4%;
+        --foreground: 213 31% 91%;
+
+        --muted: 223 47% 11%;
+        --muted-foreground: 215.4 16.3% 56.9%;
+
+        --accent: 216 34% 17%;
+        --accent-foreground: 210 40% 98%;
+
+        --popover: 224 71% 4%;
+        --popover-foreground: 215 20.2% 65.1%;
+
+        --border: 216 34% 17%;
+        --input: 216 34% 17%;
+
+        --card: 224 71% 4%;
+        --card-foreground: 213 31% 91%;
+
+        --primary: 210 40% 98%;
+        --primary-foreground: 222.2 47.4% 1.2%;
+
+        --secondary: 222.2 47.4% 11.2%;
+        --secondary-foreground: 210 40% 98%;
+
+        --destructive: 0 63% 31%;
+        --destructive-foreground: 210 40% 98%;
+
+        --ring: 216 34% 17%;
+
+        --radius: 0.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings:
+            'rlig' 1,
+            'calt' 1;
+    }
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+        'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+        'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 500;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+        monospace;
+}
+
+:root {
+    --font-text-xxm: 11px;
+    --font-text-xm: 12px;
+    --font-text-sm: 14px;
+    --font-text-md: 16px;
+    --font-text-lg: 20px;
+    --font-text-xl: 24px;
+    --font-heading: 36px;
+    --font-weight-lg: 550;
+    --font-weight-xl: 700;
+    --header-height: 56px;
+    --background-profile-height: 240px;
+    --avatar-profile-height: 136px;
+    --side-width: calc(100% * 3 / 10);
+    --page-width: calc(100% * 2 / 3);
+    --spacing-half-x: 0.4rem;
+    --spacing-one-x: 0.8rem;
+    --spacing-one-and-a-half-x: 1.2rem;
+    --spacing-two-x: 1.6rem;
+    --spacing-three-x: 2.4rem;
+    --spacing-four-x: 3.2rem;
+    --border-square-picture: 0.5rem;
+    --border-square-button: 40px;
+}
