@@ -7,3 +7,6 @@ export const VULN_SEARCH_SUCCESS_MESSAGE =
     'Analyze vulnerabilities in library successfully'
 export const DEPENDENCY_SCAN_SUCCESS_MESSAGE =
     'Scan dependencies in project successfully'
+export const GENERATE_REPORT_SUCCESS_MESSAGE =
+    'Generate report in project successfully'
+export const NO_DATA_REPORT_MESSAGE = 'There is no record'

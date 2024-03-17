@@ -1,4 +1,4 @@
-interface LibraryScanUI {
+export interface LibraryScanUI {
     info: LibraryUI
     vuln: VulnerabilityResponse
 }
@@ -73,4 +73,8 @@ export interface DatabaseSourceLink {
     source?: string
 }
 
-export default LibraryScanUI
+export interface ReportForm {
+    projectName: string
+    author: string
+    format: 'pdf' | 'excel' | 'json'
+}

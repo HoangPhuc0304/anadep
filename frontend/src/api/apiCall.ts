@@ -1,3 +1,4 @@
+import { LibraryScanUI, LibraryUI, ReportForm } from '../model/library'
 import { DEFAULT_ERROR_MESSAGE } from '../common/common'
 import { client } from '../config/requestConfig'
 
@@ -77,6 +78,45 @@ export const getScanUIResult = async (file: File) => {
         return response.status === 200
             ? response.data.libraries
             : DEFAULT_ERROR_MESSAGE
+    } catch (err) {
+        return (err as Error).message
+    }
+}
+
+export const generateReport = async (
+    libraryData: LibraryScanUI[] | LibraryUI[],
+    reportForm: ReportForm,
+    type: string
+) => {
+    try {
+        const response = await client.post(
+            '/api/report',
+            {
+                data: libraryData,
+            },
+            {
+                params: {
+                    projectName: reportForm.projectName,
+                    author: reportForm.author,
+                    type: type,
+                    format: reportForm.format,
+                },
+                responseType: 'blob',
+            }
+        )
+        if (response.status === 200) {
+            const blob = new Blob([response.data])
+            const link = document.createElement('a')
+            link.href = window.URL.createObjectURL(blob)
+            link.download = response.headers['content-disposition']
+                .split(';')[1]
+                .split('=')[1]
+                .replace(/"/g, '')
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+        }
+        return response.status === 200
     } catch (err) {
         return (err as Error).message
     }

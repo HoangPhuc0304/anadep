@@ -10,7 +10,7 @@ import {
     SheetTitle,
 } from '../../ui/sheet'
 import { Label } from '../../ui/label'
-import LibraryScanUI from '../../../model/library'
+import { LibraryScanUI } from '../../../model/library'
 import { Link } from 'react-router-dom'
 import { Badge } from '../../ui/badge'
 import { severities } from '../../../data/helper'

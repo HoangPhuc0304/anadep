@@ -5,7 +5,7 @@ library:
   available-fix:
     enable: true
   custom-fix:
-    enable: true
+    enable: false
 
 url:
   mavenClient: https://search.maven.org
@@ -16,14 +16,19 @@ url:
     npm: https://www.googleapis.com/storage/v1/b/osv-vulnerabilities
 
 spring:
-  data:
-    mongodb:
-      uri:
+#  data:
+#    mongodb:
+#      uri:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: password
+    url:
+    username:
+    password:
+  jpa:
+    hibernate:
+      ddl-auto:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   main:
     allow-bean-definition-overriding: true
   servlet:

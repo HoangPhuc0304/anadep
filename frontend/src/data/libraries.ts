@@ -1,4 +1,4 @@
-import LibraryScanUI from '../model/library'
+import { LibraryScanUI } from '../model/library'
 
 export const libraries: LibraryScanUI[] = [
     {

@@ -1,7 +1,7 @@
 import { columns } from './components/columns-search'
 import { DataTable } from './components/data-table'
 import { useEffect, useMemo, useState } from 'react'
-import LibraryScanUI from '../../model/library'
+import { LibraryScanUI } from '../../model/library'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { severities } from '../../data/helper'
 import { getSearchUIResult } from '../../api/apiCall'
@@ -14,6 +14,9 @@ import {
     VULN_SEARCH_SUCCESS_MESSAGE,
 } from '../../common/common'
 import { Skeleton } from '../ui/skeleton'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../../redux/store'
+import { update } from '../../redux/slice/vulnSearchSlice'
 
 export default function SearchingPage({
     name,
@@ -26,7 +29,11 @@ export default function SearchingPage({
     isSearch: boolean
     setIsSearch: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-    const [libraryData, setLibraryData] = useState<LibraryScanUI[]>([])
+    const libraryData: LibraryScanUI[] = useSelector(
+        (state: RootState) => state.vulnSearch
+    )
+    const dispatch = useDispatch()
+
     const [loading, setLoading] = useState<boolean>(false)
     const { toast } = useToast()
 
@@ -56,9 +63,9 @@ export default function SearchingPage({
         const data = await getSearchUIResult(packageName, version, ecosystem)
         if (typeof data === 'string') {
             handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
-            setLibraryData([])
+            dispatch(update([]))
         } else {
-            setLibraryData(data)
+            dispatch(update(data))
             handlingToastAction(SUCCESS_LABEL, VULN_SEARCH_SUCCESS_MESSAGE)
         }
         setLoading(false)
@@ -73,7 +80,7 @@ export default function SearchingPage({
     }, [isSearch])
 
     useEffect(() => {
-        loading && setLibraryData(Array(10).fill({}))
+        loading && dispatch(update(Array(10).fill({})))
     }, [loading])
 
     return (

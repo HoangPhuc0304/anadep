@@ -3,26 +3,37 @@ import { DataTable } from './components/data-table'
 import { UserNav } from './components/user-nav'
 import { useEffect, useMemo, useState } from 'react'
 import { libraries } from '../../data/libraries'
-import LibraryScanUI from '../../model/library'
+import { LibraryScanUI, ReportForm } from '../../model/library'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { severities } from '../../data/helper'
-import { getAnalysisUIResult } from '../../api/apiCall'
+import { generateReport, getAnalysisUIResult } from '../../api/apiCall'
 import { ToastAction } from '../ui/toast'
 import { useToast } from '../ui/use-toast'
 import {
     DEFAULT_ERROR_MESSAGE,
     ERROR_LABEL,
+    GENERATE_REPORT_SUCCESS_MESSAGE,
+    NO_DATA_REPORT_MESSAGE,
     SUCCESS_LABEL,
     VULN_ANALYSIS_SUCCESS_MESSAGE,
 } from '../../common/common'
 import { Skeleton } from '../ui/skeleton'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../../redux/store'
+import { update } from '../../redux/slice/vulnScanSlice'
 
 export default function VulnerabilityPage({
     file,
+    reportData,
 }: {
     file: File | undefined
+    reportData: ReportForm | undefined
 }) {
-    const [libraryData, setLibraryData] = useState<LibraryScanUI[]>([])
+    const libraryData: LibraryScanUI[] = useSelector(
+        (state: RootState) => state.vulnScan
+    )
+    const dispatch = useDispatch()
+
     const [loading, setLoading] = useState<boolean>(false)
     const { toast } = useToast()
     const loadingColumns = useMemo(
@@ -50,15 +61,33 @@ export default function VulnerabilityPage({
             const data = await getAnalysisUIResult(file)
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
-                setLibraryData([])
+                dispatch(update([]))
             } else {
-                setLibraryData(data)
+                dispatch(update(data))
                 handlingToastAction(
                     SUCCESS_LABEL,
                     VULN_ANALYSIS_SUCCESS_MESSAGE
                 )
             }
             setLoading(false)
+        }
+    }
+
+    const handlingReport = async () => {
+        if (reportData && libraryData.length > 0) {
+            const data: string | boolean = await generateReport(
+                libraryData,
+                reportData,
+                'vulns'
+            )
+            if (typeof data === 'string' || !data) {
+                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
+            } else {
+                handlingToastAction(
+                    SUCCESS_LABEL,
+                    GENERATE_REPORT_SUCCESS_MESSAGE
+                )
+            }
         }
     }
 
@@ -70,7 +99,17 @@ export default function VulnerabilityPage({
     }, [file])
 
     useEffect(() => {
-        loading && setLibraryData(Array(10).fill({}))
+        if (reportData) {
+            if (libraryData.length > 0) {
+                handlingReport()
+            } else {
+                handlingToastAction(ERROR_LABEL, NO_DATA_REPORT_MESSAGE)
+            }
+        }
+    }, [reportData])
+
+    useEffect(() => {
+        loading && dispatch(update(Array(10).fill({})))
     }, [loading])
 
     // return (

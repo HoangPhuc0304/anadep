@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from './data-table-column-header'
-import LibraryScanUI from '../../../model/library'
+import { LibraryScanUI } from '../../../model/library'
 import { Link } from 'react-router-dom'
 import { Button } from '../../ui/button'
 import { Badge } from '../../ui/badge'

@@ -3,20 +3,35 @@ import { DataTable } from './components/data-table'
 import { useEffect, useMemo, useState } from 'react'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { ecosystems } from '../../data/helper'
-import { LibraryUI } from '../../model/library'
+import { LibraryUI, ReportForm } from '../../model/library'
 import { useToast } from '../ui/use-toast'
 import { Skeleton } from '../ui/skeleton'
 import { ToastAction } from '../ui/toast'
-import { getScanUIResult } from '../../api/apiCall'
+import { generateReport, getScanUIResult } from '../../api/apiCall'
 import {
     DEFAULT_ERROR_MESSAGE,
     DEPENDENCY_SCAN_SUCCESS_MESSAGE,
     ERROR_LABEL,
+    GENERATE_REPORT_SUCCESS_MESSAGE,
+    NO_DATA_REPORT_MESSAGE,
     SUCCESS_LABEL,
 } from '../../common/common'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@/redux/store'
+import { update } from '../../redux/slice/sbomSlice'
 
-export default function SbomPage({ file }: { file: File | undefined }) {
-    const [libraryData, setLibraryData] = useState<LibraryUI[]>([])
+export default function SbomPage({
+    file,
+    reportData,
+}: {
+    file: File | undefined
+    reportData: ReportForm | undefined
+}) {
+    const libraryData: LibraryUI[] = useSelector(
+        (state: RootState) => state.sbom
+    )
+    const dispatch = useDispatch()
+
     const [loading, setLoading] = useState<boolean>(false)
     const { toast } = useToast()
 
@@ -45,15 +60,33 @@ export default function SbomPage({ file }: { file: File | undefined }) {
             const data = await getScanUIResult(file)
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
-                setLibraryData([])
+                dispatch(update([]))
             } else {
-                setLibraryData(data)
+                dispatch(update(data))
                 handlingToastAction(
                     SUCCESS_LABEL,
                     DEPENDENCY_SCAN_SUCCESS_MESSAGE
                 )
             }
             setLoading(false)
+        }
+    }
+
+    const handlingReport = async () => {
+        if (reportData && libraryData.length > 0) {
+            const data: string | boolean = await generateReport(
+                libraryData,
+                reportData,
+                'sbom'
+            )
+            if (typeof data === 'string' || !data) {
+                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
+            } else {
+                handlingToastAction(
+                    SUCCESS_LABEL,
+                    GENERATE_REPORT_SUCCESS_MESSAGE
+                )
+            }
         }
     }
 
@@ -65,7 +98,17 @@ export default function SbomPage({ file }: { file: File | undefined }) {
     }, [file])
 
     useEffect(() => {
-        loading && setLibraryData(Array(10).fill({}))
+        if (reportData) {
+            if (libraryData.length > 0) {
+                handlingReport()
+            } else {
+                handlingToastAction(ERROR_LABEL, NO_DATA_REPORT_MESSAGE)
+            }
+        }
+    }, [reportData])
+
+    useEffect(() => {
+        loading && dispatch(update(Array(10).fill({})))
     }, [loading])
 
     return (
