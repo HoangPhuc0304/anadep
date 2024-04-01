@@ -109,3 +109,31 @@ export const ecosystems: FilterOption[] = [
         value: 'Npm',
     },
 ]
+
+export const statuses: FilterOption[] = [
+    {
+        label: 'No issues',
+        color: '#009938',
+        value: 'No issues',
+    },
+    {
+        label: 'Low',
+        color: '#fcd34d',
+        value: 'Low',
+    },
+    {
+        label: 'Medium',
+        color: '#f59e0b',
+        value: 'Medium',
+    },
+    {
+        label: 'High',
+        color: '#e93838',
+        value: 'High',
+    },
+    {
+        label: 'Critical',
+        color: '#9f1420',
+        value: 'Critical',
+    },
+]

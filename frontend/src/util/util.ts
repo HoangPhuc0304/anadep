@@ -1,4 +1,5 @@
-import { LibraryUI } from '../model/library'
+import { severities } from '../data/helper'
+import { LibraryUI, VulnerabilitySummary } from '../model/library'
 
 export const getLibrarySearch = (
     libraries: LibraryUI[],
@@ -19,4 +20,19 @@ export const getRepoFromUrl = (url: string): string => {
         return repo.replace('.git', '')
     }
     return repo
+}
+
+export const getVulnerabilityStatus = (
+    vulnerabilitySummary: VulnerabilitySummary
+) => {
+    if (vulnerabilitySummary.critical) {
+        return severities[3].value
+    } else if (vulnerabilitySummary.high) {
+        return severities[2].value
+    } else if (vulnerabilitySummary.medium) {
+        return severities[1].value
+    } else if (vulnerabilitySummary.low) {
+        return severities[0].value
+    }
+    return 'No issues'
 }

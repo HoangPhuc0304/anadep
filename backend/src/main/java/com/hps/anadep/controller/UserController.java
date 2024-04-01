@@ -3,10 +3,14 @@ package com.hps.anadep.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hps.anadep.model.entity.User;
 import com.hps.anadep.model.entity.dto.AuthTokenDto;
+import com.hps.anadep.model.entity.dto.HistoryDto;
 import com.hps.anadep.model.entity.dto.RepoDto;
-import com.hps.anadep.model.entity.dto.SummaryVulnerabilityDto;
+import com.hps.anadep.model.github.AccessTokenRequest;
+import com.hps.anadep.model.github.AccessTokenResponse;
 import com.hps.anadep.model.response.ScanningResult;
+import com.hps.anadep.model.ui.AnalysisUIResult;
 import com.hps.anadep.security.AppUser;
+import com.hps.anadep.service.GitHubService;
 import com.hps.anadep.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,15 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private GitHubService gitHubService;
+
+    @PostMapping("/api/token")
+    @ResponseStatus(HttpStatus.OK)
+    public AccessTokenResponse getToken(@Valid @RequestBody AccessTokenRequest accessTokenRequest) {
+        return gitHubService.getToken(accessTokenRequest);
+    }
 
     @PostMapping("/api/user")
     @ResponseStatus(HttpStatus.OK)
@@ -51,11 +64,18 @@ public class UserController {
         return userService.findAll(appUser);
     }
 
-    @PutMapping("/api/repo/{repoId}")
+    @PutMapping("/api/repo/{repoId}/scan")
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable("repoId") String repoId, @RequestBody ScanningResult scanningResult,
                        @AuthenticationPrincipal AppUser appUser) throws JsonProcessingException {
         userService.update(repoId, scanningResult, appUser);
+    }
+
+    @PutMapping("/api/repo/{repoId}/analyze")
+    @ResponseStatus(HttpStatus.OK)
+    public void update(@PathVariable("repoId") String repoId, @RequestBody AnalysisUIResult analysisUIResult,
+                       @AuthenticationPrincipal AppUser appUser) throws JsonProcessingException {
+        userService.update(repoId, analysisUIResult, appUser);
     }
 
     @GetMapping("/api/repo/{repoId}")
@@ -70,10 +90,21 @@ public class UserController {
         userService.delete(repoId, appUser);
     }
 
-    @PostMapping("/api/summary")
+    @GetMapping("/api/repo/{repoId}/history")
     @ResponseStatus(HttpStatus.OK)
-    public SummaryVulnerabilityDto save(@Valid @RequestBody SummaryVulnerabilityDto summaryVulnerabilityDto,
-                                        @AuthenticationPrincipal AppUser appUser) {
-        return userService.save(summaryVulnerabilityDto, appUser);
+    public List<HistoryDto> getAll(@PathVariable("repoId") String repoId, @RequestParam(value = "type", required = false) String type, @AuthenticationPrincipal AppUser appUser) {
+        return userService.findAllHistories(repoId, type, appUser);
+    }
+
+    @GetMapping("/api/repo/{repoId}/history/{historyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public HistoryDto getById(@PathVariable("repoId") String repoId, @PathVariable("historyId") String historyId, @AuthenticationPrincipal AppUser appUser) {
+        return userService.findHistoryById(repoId, historyId, appUser);
+    }
+
+    @DeleteMapping("/api/repo/{repoId}/history/{historyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteById(@PathVariable("repoId") String repoId, @PathVariable("historyId") String historyId, @AuthenticationPrincipal AppUser appUser) {
+        userService.deleteHistoryById(repoId, historyId, appUser);
     }
 }

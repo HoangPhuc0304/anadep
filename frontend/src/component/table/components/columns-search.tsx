@@ -23,7 +23,9 @@ export const columns: ColumnDef<LibraryScanUI>[] = [
                 target="_blank"
                 className="max-w-[300px] line-clamp-2 font-medium"
             >
-                <Button variant="link">{row.original.vuln.id}</Button>
+                <Button variant="link" style={{ padding: 0 }}>
+                    {row.original.vuln.id}
+                </Button>
             </Link>
         ),
         enableSorting: false,

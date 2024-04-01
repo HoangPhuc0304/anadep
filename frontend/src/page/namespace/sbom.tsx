@@ -5,7 +5,9 @@ import {
     Archive,
     Boxes,
     FileText,
+    GitPullRequestArrow,
     MessagesSquare,
+    PlusCircleIcon,
     Search,
     ShieldCheck,
     ShoppingCart,
@@ -28,8 +30,17 @@ import { accounts } from './nav/data'
 import SbomPage from '../../component/table/page-lib'
 import { ToastAction } from '../../component/ui/toast'
 import { useToast } from '../../component/ui/use-toast'
-import { downloadFileFormGitHubUrl } from '../../api/apiCall'
-import { DEFAULT_ERROR_MESSAGE, ERROR_LABEL } from '../../common/common'
+import {
+    downloadFileFormGitHubUrl,
+    getAuthRepos,
+    saveRepo,
+} from '../../api/apiCall'
+import {
+    ADD_PROJECT_SUCCESS_MESSAGE,
+    DEFAULT_ERROR_MESSAGE,
+    ERROR_LABEL,
+    SUCCESS_LABEL,
+} from '../../common/common'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -42,7 +53,7 @@ import {
     FormLabel,
     FormMessage,
 } from '../../component/ui/form'
-import { ReportForm } from '../../model/library'
+import { ReportForm, Repository, User } from '../../model/library'
 import {
     Dialog,
     DialogClose,
@@ -54,6 +65,10 @@ import {
     DialogTrigger,
 } from '../../component/ui/dialog'
 import { RadioGroup, RadioGroupItem } from '../../component/ui/radio-group'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../redux/store'
+import { ScrollArea, ScrollBar } from '../../component/ui/scroll-area'
+import { Skeleton } from '../../component/ui/skeleton'
 
 const ResizablePanelGroup = ({
     className,
@@ -114,10 +129,17 @@ const formSchema = z.object({
     }),
 })
 
+const formProjectSchema = z.object({
+    name: z.string().min(1, {
+        message: 'Please choose a project.',
+    }),
+})
+
 const defaultValues: Partial<ReportForm> = {
     // name: "Your name",
     // dob: new Date("2023-01-23"),
 }
+const defaultProjectValues: Partial<Repository> = {}
 
 export function SbomScan() {
     const defaultLayout = [0, 100]
@@ -127,11 +149,19 @@ export function SbomScan() {
     const { toast } = useToast()
     const inputRef = React.useRef<HTMLInputElement>(null)
     const [file, setFile] = React.useState<File>()
+    const [repos, setRepos] = React.useState<Repository[]>([])
+    const [repo, setRepo] = React.useState<Repository>()
     const form = useForm<ReportForm>({
         resolver: zodResolver(formSchema),
         defaultValues,
     })
+    const formProject = useForm<Repository>({
+        resolver: zodResolver(formProjectSchema),
+        defaultValues: defaultProjectValues,
+    })
     const [reportData, setReportData] = React.useState<ReportForm>()
+    const [loading, setLoading] = React.useState<boolean>(false)
+    const user: User = useSelector((state: RootState) => state.user.currentUser)
 
     const handlingToastAction = (title: string, description: string) => {
         toast({
@@ -146,9 +176,12 @@ export function SbomScan() {
         setFile(files?.at(0))
     }
 
-    const handlingSearch = async (url: string | undefined) => {
+    const handlingSearch = async (
+        url: string | undefined,
+        accessToken: any
+    ) => {
         if (url) {
-            const data = await downloadFileFormGitHubUrl(url)
+            const data = await downloadFileFormGitHubUrl(url, accessToken)
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
                 return
@@ -166,6 +199,48 @@ export function SbomScan() {
         )
         setReportData(data)
     }
+
+    const handlingProjectSubmit = async (data: Repository) => {
+        let repo = repos.find((r) => r.fullName === data.name)
+        if (repo && user.githubToken) {
+            const dataRepo = await saveRepo(
+                { ...repo, userId: user.id },
+                user.githubToken
+            )
+            if (typeof dataRepo === 'string') {
+                handlingToastAction(
+                    ERROR_LABEL,
+                    dataRepo || DEFAULT_ERROR_MESSAGE
+                )
+            } else {
+                handlingToastAction(
+                    'Report Processing',
+                    'This action can take some minutes'
+                )
+                setRepo(dataRepo)
+            }
+            handlingSearch(repo.githubUrl, user.githubToken)
+        }
+    }
+
+    const handlingGetRepos = () => {
+        setLoading(true)
+        fetchData()
+    }
+
+    const fetchData = async () => {
+        const data = await getAuthRepos(user.githubToken || '')
+        if (typeof data === 'string') {
+            handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
+        } else {
+            setRepos(data)
+        }
+        setLoading(false)
+    }
+
+    React.useEffect(() => {
+        loading && setRepos(Array(10).fill({}))
+    }, [loading])
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -203,26 +278,55 @@ export function SbomScan() {
                     <Separator />
                     <Nav
                         isCollapsed={isCollapsed}
-                        links={[
-                            {
-                                title: 'Vulnerability Scanning',
-                                href: '/namespace',
-                                icon: ShieldCheck,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Vulnerability Searching',
-                                href: '/search',
-                                icon: Search,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'SBOM',
-                                href: '/sbom',
-                                icon: Boxes,
-                                variant: 'default',
-                            },
-                        ]}
+                        links={
+                            user.id
+                                ? [
+                                      {
+                                          title: 'Vulnerability Searching',
+                                          href: '/search',
+                                          icon: Search,
+                                          variant: 'ghost',
+                                      },
+                                      {
+                                          title: 'Vulnerability Scanning',
+                                          href: '/namespace',
+                                          icon: ShieldCheck,
+                                          variant: 'ghost',
+                                      },
+                                      {
+                                          title: 'SBOM',
+                                          href: '/sbom',
+                                          icon: Boxes,
+                                          variant: 'default',
+                                      },
+                                      {
+                                          title: 'Project',
+                                          href: '/project',
+                                          icon: GitPullRequestArrow,
+                                          variant: 'ghost',
+                                      },
+                                  ]
+                                : [
+                                      {
+                                          title: 'Vulnerability Searching',
+                                          href: '/search',
+                                          icon: Search,
+                                          variant: 'ghost',
+                                      },
+                                      {
+                                          title: 'Vulnerability Scanning',
+                                          href: '/namespace',
+                                          icon: ShieldCheck,
+                                          variant: 'ghost',
+                                      },
+                                      {
+                                          title: 'SBOM',
+                                          href: '/sbom',
+                                          icon: Boxes,
+                                          variant: 'default',
+                                      },
+                                  ]
+                        }
                     />
                     <Separator />
                     <Nav
@@ -268,6 +372,125 @@ export function SbomScan() {
                             <h1 className="text-xl font-bold">SBOM</h1>
                             <div className="flex items-center p-2">
                                 <div className="flex items-center gap-2"></div>
+                                {user.id && (
+                                    <Dialog>
+                                        <DialogTrigger
+                                            asChild
+                                            onClick={handlingGetRepos}
+                                        >
+                                            <Button>
+                                                <PlusCircleIcon className="mr-2" />
+                                                Add Projects
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <Form {...formProject}>
+                                                <form
+                                                    onSubmit={formProject.handleSubmit(
+                                                        handlingProjectSubmit
+                                                    )}
+                                                    className="space-y-8"
+                                                >
+                                                    <DialogHeader>
+                                                        <DialogTitle>
+                                                            Add GitHub Project
+                                                        </DialogTitle>
+                                                        <DialogDescription>
+                                                            Please select the
+                                                            project you want to
+                                                            be integrated with
+                                                            our service
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <FormField
+                                                        control={
+                                                            formProject.control
+                                                        }
+                                                        name="name"
+                                                        render={({ field }) => (
+                                                            <FormItem className="space-y-3">
+                                                                <FormLabel>
+                                                                    Please
+                                                                    choose a
+                                                                    project
+                                                                </FormLabel>
+                                                                <ScrollArea className="h-[450px] w-full px-4">
+                                                                    <FormControl>
+                                                                        <RadioGroup
+                                                                            onValueChange={
+                                                                                field.onChange
+                                                                            }
+                                                                            defaultValue={
+                                                                                field.value
+                                                                            }
+                                                                            className="flex flex-col space-y-1"
+                                                                        >
+                                                                            {loading
+                                                                                ? repos.map(
+                                                                                      (
+                                                                                          rp,
+                                                                                          index
+                                                                                      ) => (
+                                                                                          <Skeleton
+                                                                                              className="h-[40px] w-full"
+                                                                                              key={
+                                                                                                  index +
+                                                                                                  1
+                                                                                              }
+                                                                                          />
+                                                                                      )
+                                                                                  )
+                                                                                : repos.map(
+                                                                                      (
+                                                                                          rp
+                                                                                      ) => (
+                                                                                          <FormItem
+                                                                                              className="flex items-center space-x-3 space-y-0"
+                                                                                              key={
+                                                                                                  rp.fullName
+                                                                                              }
+                                                                                          >
+                                                                                              <FormControl>
+                                                                                                  <RadioGroupItem
+                                                                                                      value={
+                                                                                                          rp.fullName
+                                                                                                      }
+                                                                                                  />
+                                                                                              </FormControl>
+                                                                                              <FormLabel className="font-normal">
+                                                                                                  {
+                                                                                                      rp.fullName
+                                                                                                  }
+                                                                                              </FormLabel>
+                                                                                          </FormItem>
+                                                                                      )
+                                                                                  )}
+                                                                        </RadioGroup>
+                                                                    </FormControl>
+                                                                    <ScrollBar orientation="horizontal" />
+                                                                </ScrollArea>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    <DialogFooter>
+                                                        <DialogClose asChild>
+                                                            <Button
+                                                                type="button"
+                                                                variant="secondary"
+                                                            >
+                                                                Cancel
+                                                            </Button>
+                                                        </DialogClose>
+                                                        <Button type="submit">
+                                                            Add
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </form>
+                                            </Form>
+                                        </DialogContent>
+                                    </Dialog>
+                                )}
                                 <Separator
                                     orientation="vertical"
                                     className="mx-2 h-6"
@@ -436,7 +659,8 @@ export function SbomScan() {
                                                 onClick={(e) => {
                                                     e.preventDefault()
                                                     handlingSearch(
-                                                        inputRef.current?.value
+                                                        inputRef.current?.value,
+                                                        user.githubToken
                                                     )
                                                     handlingToastAction(
                                                         'Analysis Processing',
@@ -472,7 +696,7 @@ export function SbomScan() {
                             </form>
                         </div>
                     </Tabs>
-                    <SbomPage file={file} reportData={reportData} />
+                    <SbomPage file={file} reportData={reportData} repo={repo} />
                 </ResizablePanel>
             </ResizablePanelGroup>
         </TooltipProvider>

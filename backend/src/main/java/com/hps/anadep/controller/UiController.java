@@ -5,6 +5,7 @@ import com.hps.anadep.model.Library;
 import com.hps.anadep.model.osv.Vulnerability;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.ui.AnalysisUIResult;
+import com.hps.anadep.model.ui.VulnerabilitySummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -39,14 +40,21 @@ public class UiController {
 
     @GetMapping("/ui/repo/download")
     @ResponseStatus(HttpStatus.OK)
-    public byte[] repoDownload(@RequestParam("url") String url)
+    public byte[] repoDownload(@RequestParam("url") String url,
+                               @RequestParam(value = "accessToken", required = false) String accessToken)
             throws Exception {
-        return uiService.repoDownload(url);
+        return uiService.repoDownload(url, accessToken);
     }
 
     @GetMapping("/ui/vulns/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Vulnerability getVuln(@PathVariable("id") String id){
         return uiService.getVulnById(id);
+    }
+
+    @PostMapping("/ui/summary")
+    @ResponseStatus(HttpStatus.OK)
+    public VulnerabilitySummary analyze(@RequestBody AnalysisUIResult analysisUIResult) {
+        return uiService.summary(analysisUIResult);
     }
 }
