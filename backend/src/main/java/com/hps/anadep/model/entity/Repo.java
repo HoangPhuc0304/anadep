@@ -28,19 +28,16 @@ public class Repo {
     @NotEmpty
     private String fullName;
 
+    private String owner;
+
     private boolean isPublic;
 
     private String githubUrl;
 
     private String language;
 
-    @Column(columnDefinition = "TEXT")
-    private String scanningResult;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @OneToOne(mappedBy = "repository", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private SummaryVulnerability summaryVulnerability;
 }

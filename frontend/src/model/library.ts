@@ -9,6 +9,23 @@ export interface LibraryUI {
     ecosystem: string
 }
 
+export interface ScanningResult {
+    libraries: LibraryUI[]
+    ecosystem: string
+    libraryCount: number
+    includeTransitive: boolean
+    responseTime: number
+}
+
+export interface AnalysisUIResult {
+    libs: LibraryScanUI[]
+    ecosystem: string
+    issuesCount: number
+    libraryCount: number
+    includeSafe: boolean
+    responseTime: number
+}
+
 export interface VulnerabilityResponse {
     id: string
     summary?: string
@@ -77,4 +94,58 @@ export interface ReportForm {
     projectName: string
     author: string
     format: 'pdf' | 'excel' | 'json'
+    type?: 'vulns' | 'sbom'
+}
+
+export interface AccessTokenResponse {
+    accessToken: string
+    scope: string
+    tokenType: string
+}
+
+export interface User {
+    id?: string
+    githubUserId: number
+    login: string
+    name: string
+    avatarUrl: string
+    githubUrl: string
+    email: string
+    githubToken?: string
+}
+
+export interface Repository {
+    id?: string
+    githubRepoId: number
+    name: string
+    fullName: string
+    owner: string
+    isPublic: boolean
+    githubUrl: string
+    language: boolean
+    scanningResult?: ScanningResult
+    userId?: string
+    updatedBy?: string
+    createdAt?: string
+    vulnerabilityResult?: AnalysisUIResult
+    vulnerabilitySummary?: VulnerabilitySummary
+    historyId: string
+}
+
+export interface VulnerabilitySummary {
+    none: number
+    low: number
+    medium: number
+    high: number
+    critical: number
+    status: string
+}
+
+export interface History {
+    id: string
+    scanningResult: ScanningResult
+    vulnerabilityResult: AnalysisUIResult
+    type: string
+    createdAt: string
+    repoId: string
 }

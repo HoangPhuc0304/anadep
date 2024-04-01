@@ -3,10 +3,19 @@ import { DataTable } from './components/data-table'
 import { UserNav } from './components/user-nav'
 import { useEffect, useMemo, useState } from 'react'
 import { libraries } from '../../data/libraries'
-import { LibraryScanUI, ReportForm } from '../../model/library'
+import {
+    AnalysisUIResult,
+    ReportForm,
+    Repository,
+    User,
+} from '../../model/library'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { severities } from '../../data/helper'
-import { generateReport, getAnalysisUIResult } from '../../api/apiCall'
+import {
+    generateReport,
+    getAnalysisUIResult,
+    updateRepoWithVulns,
+} from '../../api/apiCall'
 import { ToastAction } from '../ui/toast'
 import { useToast } from '../ui/use-toast'
 import {
@@ -15,6 +24,7 @@ import {
     GENERATE_REPORT_SUCCESS_MESSAGE,
     NO_DATA_REPORT_MESSAGE,
     SUCCESS_LABEL,
+    UPDATE_PROJECT_SUCCESS_MESSAGE,
     VULN_ANALYSIS_SUCCESS_MESSAGE,
 } from '../../common/common'
 import { Skeleton } from '../ui/skeleton'
@@ -25,13 +35,16 @@ import { update } from '../../redux/slice/vulnScanSlice'
 export default function VulnerabilityPage({
     file,
     reportData,
+    repo,
 }: {
     file: File | undefined
     reportData: ReportForm | undefined
+    repo: Repository | undefined
 }) {
-    const libraryData: LibraryScanUI[] = useSelector(
+    const analysisUIResult: AnalysisUIResult = useSelector(
         (state: RootState) => state.vulnScan
     )
+    const user: User = useSelector((state: RootState) => state.user.currentUser)
     const dispatch = useDispatch()
 
     const [loading, setLoading] = useState<boolean>(false)
@@ -61,22 +74,27 @@ export default function VulnerabilityPage({
             const data = await getAnalysisUIResult(file)
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
-                dispatch(update([]))
+                dispatch(update({ ...analysisUIResult, libs: [] }))
             } else {
                 dispatch(update(data))
                 handlingToastAction(
                     SUCCESS_LABEL,
                     VULN_ANALYSIS_SUCCESS_MESSAGE
                 )
+                if (repo && data.libs) {
+                    if (data.libs.length > 0) {
+                        handlingUpdateRepo(data)
+                    }
+                }
             }
             setLoading(false)
         }
     }
 
     const handlingReport = async () => {
-        if (reportData && libraryData.length > 0) {
+        if (reportData && analysisUIResult.libs.length > 0) {
             const data: string | boolean = await generateReport(
-                libraryData,
+                analysisUIResult.libs,
                 reportData,
                 'vulns'
             )
@@ -91,6 +109,19 @@ export default function VulnerabilityPage({
         }
     }
 
+    const handlingUpdateRepo = async (result: AnalysisUIResult) => {
+        if (repo && user.githubToken) {
+            const data = await updateRepoWithVulns(
+                repo,
+                result,
+                user.githubToken
+            )
+            if (typeof data === 'string' && data.length !== 0) {
+                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
+            }
+        }
+    }
+
     useEffect(() => {
         if (file) {
             setLoading(true)
@@ -100,7 +131,7 @@ export default function VulnerabilityPage({
 
     useEffect(() => {
         if (reportData) {
-            if (libraryData.length > 0) {
+            if (analysisUIResult.libs.length > 0) {
                 handlingReport()
             } else {
                 handlingToastAction(ERROR_LABEL, NO_DATA_REPORT_MESSAGE)
@@ -109,7 +140,8 @@ export default function VulnerabilityPage({
     }, [reportData])
 
     useEffect(() => {
-        loading && dispatch(update(Array(10).fill({})))
+        loading &&
+            dispatch(update({ ...analysisUIResult, libs: Array(10).fill({}) }))
     }, [loading])
 
     // return (
@@ -135,7 +167,7 @@ export default function VulnerabilityPage({
             <ScrollArea className="h-[640px] w-full px-4">
                 {loading ? (
                     <DataTable
-                        data={libraryData}
+                        data={analysisUIResult.libs}
                         columns={loadingColumns}
                         input={{ column: 'packageName', title: 'Package Name' }}
                         filter={{
@@ -146,7 +178,7 @@ export default function VulnerabilityPage({
                     />
                 ) : (
                     <DataTable
-                        data={libraryData}
+                        data={analysisUIResult.libs}
                         columns={columns}
                         input={{ column: 'packageName', title: 'Package Name' }}
                         filter={{

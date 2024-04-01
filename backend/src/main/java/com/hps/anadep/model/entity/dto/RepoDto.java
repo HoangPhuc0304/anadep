@@ -1,7 +1,7 @@
 package com.hps.anadep.model.entity.dto;
 
-import com.hps.anadep.model.entity.SummaryVulnerability;
 import com.hps.anadep.model.response.ScanningResult;
+import com.hps.anadep.model.ui.AnalysisUIResult;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +23,8 @@ public class RepoDto {
     @NotEmpty
     private String fullName;
 
+    private String owner;
+
     private boolean isPublic;
 
     private String githubUrl;
@@ -33,5 +35,5 @@ public class RepoDto {
 
     private UUID userId;
 
-    private SummaryVulnerabilityDto summaryVulnerability;
+    private AnalysisUIResult vulnerabilityResult = new AnalysisUIResult();
 }

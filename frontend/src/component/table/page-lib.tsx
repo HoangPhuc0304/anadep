@@ -3,11 +3,21 @@ import { DataTable } from './components/data-table'
 import { useEffect, useMemo, useState } from 'react'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { ecosystems } from '../../data/helper'
-import { LibraryUI, ReportForm } from '../../model/library'
+import {
+    LibraryUI,
+    ReportForm,
+    Repository,
+    ScanningResult,
+    User,
+} from '../../model/library'
 import { useToast } from '../ui/use-toast'
 import { Skeleton } from '../ui/skeleton'
 import { ToastAction } from '../ui/toast'
-import { generateReport, getScanUIResult } from '../../api/apiCall'
+import {
+    generateReport,
+    getScanUIResult,
+    updateRepoWithSbom,
+} from '../../api/apiCall'
 import {
     DEFAULT_ERROR_MESSAGE,
     DEPENDENCY_SCAN_SUCCESS_MESSAGE,
@@ -15,6 +25,7 @@ import {
     GENERATE_REPORT_SUCCESS_MESSAGE,
     NO_DATA_REPORT_MESSAGE,
     SUCCESS_LABEL,
+    UPDATE_PROJECT_SUCCESS_MESSAGE,
 } from '../../common/common'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
@@ -23,13 +34,16 @@ import { update } from '../../redux/slice/sbomSlice'
 export default function SbomPage({
     file,
     reportData,
+    repo,
 }: {
     file: File | undefined
     reportData: ReportForm | undefined
+    repo: Repository | undefined
 }) {
-    const libraryData: LibraryUI[] = useSelector(
+    const scanningResult: ScanningResult = useSelector(
         (state: RootState) => state.sbom
     )
+    const user: User = useSelector((state: RootState) => state.user.currentUser)
     const dispatch = useDispatch()
 
     const [loading, setLoading] = useState<boolean>(false)
@@ -60,22 +74,27 @@ export default function SbomPage({
             const data = await getScanUIResult(file)
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
-                dispatch(update([]))
+                dispatch(update({ ...scanningResult, libraries: [] }))
             } else {
                 dispatch(update(data))
                 handlingToastAction(
                     SUCCESS_LABEL,
                     DEPENDENCY_SCAN_SUCCESS_MESSAGE
                 )
+                if (repo && data.libraries) {
+                    if (data.libraries.length > 0) {
+                        handlingUpdateRepo(data)
+                    }
+                }
             }
             setLoading(false)
         }
     }
 
     const handlingReport = async () => {
-        if (reportData && libraryData.length > 0) {
+        if (reportData && scanningResult.libraries.length > 0) {
             const data: string | boolean = await generateReport(
-                libraryData,
+                scanningResult.libraries,
                 reportData,
                 'sbom'
             )
@@ -90,6 +109,19 @@ export default function SbomPage({
         }
     }
 
+    const handlingUpdateRepo = async (result: ScanningResult) => {
+        if (repo && user.githubToken) {
+            const data = await updateRepoWithSbom(
+                repo,
+                result,
+                user.githubToken
+            )
+            if (typeof data === 'string' && data.length !== 0) {
+                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
+            }
+        }
+    }
+
     useEffect(() => {
         if (file) {
             setLoading(true)
@@ -99,7 +131,7 @@ export default function SbomPage({
 
     useEffect(() => {
         if (reportData) {
-            if (libraryData.length > 0) {
+            if (scanningResult.libraries.length > 0) {
                 handlingReport()
             } else {
                 handlingToastAction(ERROR_LABEL, NO_DATA_REPORT_MESSAGE)
@@ -108,7 +140,10 @@ export default function SbomPage({
     }, [reportData])
 
     useEffect(() => {
-        loading && dispatch(update(Array(10).fill({})))
+        loading &&
+            dispatch(
+                update({ ...scanningResult, libraries: Array(10).fill({}) })
+            )
     }, [loading])
 
     return (
@@ -116,7 +151,7 @@ export default function SbomPage({
             <ScrollArea className="h-[640px] w-full px-4">
                 {loading ? (
                     <DataTable
-                        data={libraryData}
+                        data={scanningResult.libraries}
                         columns={loadingColumns}
                         input={{ column: 'name', title: 'Name' }}
                         filter={{
@@ -127,7 +162,7 @@ export default function SbomPage({
                     />
                 ) : (
                     <DataTable
-                        data={libraryData}
+                        data={scanningResult.libraries}
                         columns={columns}
                         input={{ column: 'name', title: 'Name' }}
                         filter={{

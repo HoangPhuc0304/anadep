@@ -13,6 +13,7 @@ import {
 import vulnScanSlice from './slice/vulnScanSlice'
 import vulnSearchSlice from './slice/vulnSearchSlice'
 import sbomSlice from './slice/sbomSlice'
+import userSlice from './slice/userSlice'
 
 const persistConfig = {
     key: 'root',
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
     vulnScan: vulnScanSlice.reducer,
     vulnSearch: vulnSearchSlice.reducer,
     sbom: sbomSlice.reducer,
+    user: userSlice.reducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

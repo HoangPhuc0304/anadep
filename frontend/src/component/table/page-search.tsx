@@ -1,7 +1,7 @@
 import { columns } from './components/columns-search'
 import { DataTable } from './components/data-table'
 import { useEffect, useMemo, useState } from 'react'
-import { LibraryScanUI } from '../../model/library'
+import { AnalysisUIResult } from '../../model/library'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { severities } from '../../data/helper'
 import { getSearchUIResult } from '../../api/apiCall'
@@ -29,7 +29,7 @@ export default function SearchingPage({
     isSearch: boolean
     setIsSearch: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-    const libraryData: LibraryScanUI[] = useSelector(
+    const analysisUIResult: AnalysisUIResult = useSelector(
         (state: RootState) => state.vulnSearch
     )
     const dispatch = useDispatch()
@@ -63,7 +63,7 @@ export default function SearchingPage({
         const data = await getSearchUIResult(packageName, version, ecosystem)
         if (typeof data === 'string') {
             handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
-            dispatch(update([]))
+            dispatch(update({ ...analysisUIResult, libs: [] }))
         } else {
             dispatch(update(data))
             handlingToastAction(SUCCESS_LABEL, VULN_SEARCH_SUCCESS_MESSAGE)
@@ -80,7 +80,8 @@ export default function SearchingPage({
     }, [isSearch])
 
     useEffect(() => {
-        loading && dispatch(update(Array(10).fill({})))
+        loading &&
+            dispatch(update({ ...analysisUIResult, libs: Array(10).fill({}) }))
     }, [loading])
 
     return (
@@ -88,7 +89,7 @@ export default function SearchingPage({
             <ScrollArea className="h-[640px] w-full px-4">
                 {loading ? (
                     <DataTable
-                        data={libraryData}
+                        data={analysisUIResult.libs}
                         columns={loadingColumns}
                         input={{ column: 'packageName', title: 'Package Name' }}
                         filter={{
@@ -99,7 +100,7 @@ export default function SearchingPage({
                     />
                 ) : (
                     <DataTable
-                        data={libraryData}
+                        data={analysisUIResult.libs}
                         columns={columns}
                         input={{ column: 'packageName', title: 'Package Name' }}
                         filter={{
