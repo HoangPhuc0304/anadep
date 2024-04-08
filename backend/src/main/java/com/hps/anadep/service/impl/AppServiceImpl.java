@@ -41,6 +41,11 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
+    public AnalysisResult retrieveV2(Library library) {
+        return analyzerService.analyzeV2(library);
+    }
+
+    @Override
     public ScanningResult scan(MultipartFile file, boolean includeTransitive) throws Exception {
         long start = System.currentTimeMillis();
         Set<Library> libraries = scannerService.scan(file, includeTransitive);
@@ -75,9 +80,27 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public AnalysisResult analyze(ScanningResult scanningResult,  Boolean includeSafe) throws Exception {
+    public AnalysisResult analyzeV2(MultipartFile file, Boolean includeSafe) throws Exception {
+        long start = System.currentTimeMillis();
+        Set<Library> libraries = scannerService.scan(file, true);
+        long scanningTime = System.currentTimeMillis() - start;
+        AnalysisResult analysisResult = analyzerService.analyzeV2(libraries, includeSafe);
+        analysisResult.setResponseTime(analysisResult.getResponseTime() + scanningTime);
+        return analysisResult;
+    }
+
+    @Override
+    public AnalysisResult analyzeFast(ScanningResult scanningResult, Boolean includeSafe) throws Exception {
         Set<Library> libraries = scanningResult.getLibraries();
         AnalysisResult analysisResult = analyzerService.analyze(libraries, includeSafe);
+        analysisResult.setResponseTime(analysisResult.getResponseTime());
+        return analysisResult;
+    }
+
+    @Override
+    public AnalysisResult analyzeFastV2(ScanningResult scanningResult, Boolean includeSafe) throws Exception {
+        Set<Library> libraries = scanningResult.getLibraries();
+        AnalysisResult analysisResult = analyzerService.analyzeV2(libraries, includeSafe);
         analysisResult.setResponseTime(analysisResult.getResponseTime());
         return analysisResult;
     }

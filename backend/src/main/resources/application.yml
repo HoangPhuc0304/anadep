@@ -11,15 +11,13 @@ url:
   mavenClient: https://search.maven.org
   osvClient: https://api.osv.dev
   githubClient: https://api.github.com
+  anadepClient: http://localhost:8081
   authGithubClient: https://github.com
   uiClient: http://localhost:3000
   osvStorage:
     npm: https://www.googleapis.com/storage/v1/b/osv-vulnerabilities
 
 spring:
-#  data:
-#    mongodb:
-#      uri:
   datasource:
     url:
     username:

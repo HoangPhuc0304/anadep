@@ -96,7 +96,7 @@ public class MavenTool implements PackageManagementTool {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                }))
+                }, executorService))
                 .toList();
 
         CompletableFuture.allOf(completableFutures.toArray(new CompletableFuture[0])).join();

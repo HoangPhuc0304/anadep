@@ -29,6 +29,12 @@ public class AppController {
         return appService.retrieve(library);
     }
 
+    @PostMapping("/api/retrieve/v2")
+    @ResponseStatus(HttpStatus.OK)
+    public AnalysisResult scanV2(@RequestBody Library library) {
+        return appService.retrieveV2(library);
+    }
+
     @PostMapping("/api/scan")
     @ResponseStatus(HttpStatus.OK)
     public ScanningResult scan(@RequestParam("file") MultipartFile file,
@@ -47,10 +53,26 @@ public class AppController {
 
     @PostMapping("/api/analyze/v2")
     @ResponseStatus(HttpStatus.OK)
-    public AnalysisResult analyze(@RequestBody ScanningResult scanningResult,
+    public AnalysisResult analyzeV2(@RequestParam("file") MultipartFile file,
                                   @RequestParam(value = "includeSafe", defaultValue = "false") boolean includeSafe)
             throws Exception {
-        return appService.analyze(scanningResult, includeSafe);
+        return appService.analyzeV2(file, includeSafe);
+    }
+
+    @PostMapping("/api/analyze-fast")
+    @ResponseStatus(HttpStatus.OK)
+    public AnalysisResult analyzeFast(@RequestBody ScanningResult scanningResult,
+                                  @RequestParam(value = "includeSafe", defaultValue = "false") boolean includeSafe)
+            throws Exception {
+        return appService.analyzeFast(scanningResult, includeSafe);
+    }
+
+    @PostMapping("/api/analyze-fast/v2")
+    @ResponseStatus(HttpStatus.OK)
+    public AnalysisResult analyzeFastV2(@RequestBody ScanningResult scanningResult,
+                                        @RequestParam(value = "includeSafe", defaultValue = "false") boolean includeSafe)
+            throws Exception {
+        return appService.analyzeFastV2(scanningResult, includeSafe);
     }
 
     @GetMapping("/api/evaluate")

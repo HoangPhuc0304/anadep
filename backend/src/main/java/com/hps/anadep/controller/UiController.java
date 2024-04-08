@@ -23,6 +23,12 @@ public class UiController {
         return uiService.retrieve(library);
     }
 
+    @PostMapping("/ui/retrieve/v2")
+    @ResponseStatus(HttpStatus.OK)
+    public AnalysisUIResult scanV2(@RequestBody Library library) {
+        return uiService.retrieveV2(library);
+    }
+
     @PostMapping("/ui/scan")
     @ResponseStatus(HttpStatus.OK)
     public ScanningResult scan(@RequestParam("file") MultipartFile file,
@@ -38,6 +44,13 @@ public class UiController {
         return uiService.analyze(file, false);
     }
 
+    @PostMapping("/ui/analyze/v2")
+    @ResponseStatus(HttpStatus.OK)
+    public AnalysisUIResult analyzeV2(@RequestParam("file") MultipartFile file)
+            throws Exception {
+        return uiService.analyzeV2(file, false);
+    }
+
     @GetMapping("/ui/repo/download")
     @ResponseStatus(HttpStatus.OK)
     public byte[] repoDownload(@RequestParam("url") String url,
@@ -50,6 +63,12 @@ public class UiController {
     @ResponseStatus(HttpStatus.OK)
     public Vulnerability getVuln(@PathVariable("id") String id){
         return uiService.getVulnById(id);
+    }
+
+    @GetMapping("/ui/vulns/{id}/v2")
+    @ResponseStatus(HttpStatus.OK)
+    public Vulnerability getVulnV2(@PathVariable("id") String id){
+        return uiService.getVulnByIdV2(id);
     }
 
     @PostMapping("/ui/summary")

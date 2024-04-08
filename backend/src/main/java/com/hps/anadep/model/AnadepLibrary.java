@@ -1,6 +1,6 @@
-package com.hps.anadep.model.response;
+package com.hps.anadep.model;
 
-import com.hps.anadep.model.Library;
+import com.hps.anadep.model.osv.Vulnerability;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LibraryScan {
+public class AnadepLibrary {
     private Library info;
-    private List<VulnerabilityResponse> vulns;
+    private List<Vulnerability> vulns;
 }

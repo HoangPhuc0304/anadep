@@ -151,7 +151,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                     } catch (Exception e) {
                         return null;
                     }
-                }))
+                }, executorService))
                 .toList();
         Set<String> fixedVersionSet = new HashSet<>();
         List<String> fixedVersion = completableFutures.stream()

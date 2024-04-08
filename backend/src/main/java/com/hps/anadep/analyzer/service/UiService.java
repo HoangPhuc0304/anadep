@@ -9,14 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UiService {
     AnalysisUIResult retrieve(Library library);
-
+    AnalysisUIResult retrieveV2(Library library);
     ScanningResult scan(MultipartFile file, boolean includeTransitive) throws Exception;
-
     AnalysisUIResult analyze(MultipartFile file, boolean includeSafe) throws Exception;
-
+    AnalysisUIResult analyzeV2(MultipartFile file, boolean includeSafe) throws Exception;
     byte[] repoDownload(String url, String accessToken);
-
     Vulnerability getVulnById(String id);
-
+    Vulnerability getVulnByIdV2(String id);
     VulnerabilitySummary summary(AnalysisUIResult analysisUIResult);
 }
