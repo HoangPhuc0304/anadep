@@ -1,5 +1,6 @@
 package com.hps.anadep.analyzer.service.impl;
 
+import com.hps.anadep.analyzer.client.AnadepClient;
 import com.hps.anadep.analyzer.client.GithubClient;
 import com.hps.anadep.analyzer.client.OsvClient;
 import com.hps.anadep.analyzer.service.UiService;
@@ -30,25 +31,19 @@ public class UiServiceImpl implements UiService {
     private GithubClient githubClient;
     @Autowired
     private OsvClient osvClient;
+    @Autowired
+    private AnadepClient anadepClient;
 
     @Override
     public AnalysisUIResult retrieve(Library library) {
         AnalysisResult analysisResult = appService.retrieve(library);
-        List<LibraryScanUI> libs = new ArrayList<>();
-        for (LibraryScan libScan : analysisResult.getLibs()) {
-            Library info = new Library(libScan.getInfo().getName(), libScan.getInfo().getVersion(), libScan.getInfo().getEcosystem());
-            for (VulnerabilityResponse vulRes : libScan.getVulns()) {
-                libs.add(new LibraryScanUI(info, vulRes));
-            }
-        }
-        return new AnalysisUIResult(
-                libs,
-                analysisResult.getEcosystem(),
-                analysisResult.getIssuesCount(),
-                analysisResult.getLibraryCount(),
-                analysisResult.isIncludeSafe(),
-                analysisResult.getResponseTime()
-        );
+        return getAnalysisUIResult(analysisResult);
+    }
+
+    @Override
+    public AnalysisUIResult retrieveV2(Library library) {
+        AnalysisResult analysisResult = appService.retrieveV2(library);
+        return getAnalysisUIResult(analysisResult);
     }
 
     @Override
@@ -63,6 +58,12 @@ public class UiServiceImpl implements UiService {
     }
 
     @Override
+    public AnalysisUIResult analyzeV2(MultipartFile file, boolean includeSafe) throws Exception {
+        AnalysisResult analysisResult = appService.analyzeV2(file, includeSafe);
+        return appService.reformat(analysisResult);
+    }
+
+    @Override
     public byte[] repoDownload(String url, String accessToken) {
         String repo = getRepoFromGithubUrl(url);
         return githubClient.download(repo, accessToken);
@@ -71,6 +72,11 @@ public class UiServiceImpl implements UiService {
     @Override
     public Vulnerability getVulnById(String id) {
         return osvClient.getVulnerability(id);
+    }
+
+    @Override
+    public Vulnerability getVulnByIdV2(String id) {
+        return anadepClient.getVulnerability(id);
     }
 
     @Override
@@ -93,6 +99,24 @@ public class UiServiceImpl implements UiService {
             }
         });
         return vulnerabilitySummary;
+    }
+
+    private AnalysisUIResult getAnalysisUIResult(AnalysisResult analysisResult) {
+        List<LibraryScanUI> libs = new ArrayList<>();
+        for (LibraryScan libScan : analysisResult.getLibs()) {
+            Library info = new Library(libScan.getInfo().getName(), libScan.getInfo().getVersion(), libScan.getInfo().getEcosystem());
+            for (VulnerabilityResponse vulRes : libScan.getVulns()) {
+                libs.add(new LibraryScanUI(info, vulRes));
+            }
+        }
+        return new AnalysisUIResult(
+                libs,
+                analysisResult.getEcosystem(),
+                analysisResult.getIssuesCount(),
+                analysisResult.getLibraryCount(),
+                analysisResult.isIncludeSafe(),
+                analysisResult.getResponseTime()
+        );
     }
 
     private String getRepoFromGithubUrl(String url) {

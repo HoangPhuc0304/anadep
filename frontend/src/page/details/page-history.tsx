@@ -188,13 +188,13 @@ export function HistoryDetails() {
                         isCollapsed={isCollapsed}
                         links={[
                             {
-                                title: 'Vulnerability Searching',
+                                title: 'Searching',
                                 href: '/search',
                                 icon: Search,
                                 variant: 'ghost',
                             },
                             {
-                                title: 'Vulnerability Scanning',
+                                title: 'Vulnerability',
                                 href: '/namespace',
                                 icon: ShieldCheck,
                                 variant: 'ghost',

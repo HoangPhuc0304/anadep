@@ -15,21 +15,15 @@ import java.io.IOException;
 
 public interface AppService {
     AnalysisResult retrieve(Library libraryInfo);
-
+    AnalysisResult retrieveV2(Library libraryInfo);
     ScanningResult scan(MultipartFile file, boolean includeTransitive) throws Exception;
-
     AnalysisResult analyze(MultipartFile file, Boolean includeSafe) throws Exception;
-
-    AnalysisResult analyze(ScanningResult scanningResult,  Boolean includeSafe) throws Exception;
-
+    AnalysisResult analyzeV2(MultipartFile file, Boolean includeSafe) throws Exception;
+    AnalysisResult analyzeFast(ScanningResult scanningResult,  Boolean includeSafe) throws Exception;
+    AnalysisResult analyzeFastV2(ScanningResult scanningResult,  Boolean includeSafe) throws Exception;
     Severity evaluate(String vector);
-
     FixResult autoFix(AnalysisResult analysisResult);
-
     void export(ReportRequest reportRequest, String projectName, String author, String type, String format, HttpServletResponse response) throws Exception;
-
     AnalysisUIResult reformat(AnalysisResult analysisResult);
-
     SummaryFix applyFix(FixResult fixResult, MultipartFile file) throws Exception;
-
 }
