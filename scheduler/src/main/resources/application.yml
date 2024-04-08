@@ -1,0 +1,15 @@
+
+spring:
+  application:
+    name: anadep-scheduler
+  cloud:
+    aws:
+      credentials:
+        access-key:
+        secret-key:
+      region:
+        static:
+      dynamodb:
+        endpoint:
+server:
+  port: 8081
