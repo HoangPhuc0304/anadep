@@ -29,6 +29,8 @@ public class RepoDto {
 
     private String githubUrl;
 
+    private String defaultBranch;
+
     private String language;
 
     private ScanningResult scanningResult = new ScanningResult();

@@ -18,7 +18,9 @@ export const vulnsColumns: ColumnDef<Repository>[] = [
         ),
         cell: ({ row }) => (
             <Link
-                to={`/project/${row.original.id}/history/${row.original.historyId}`}
+                to={row.index === 0
+                    ? `/project/${row.original.id}/history/${row.original.historyId}?fixAvailable=true`
+                    : `/project/${row.original.id}/history/${row.original.historyId}`}
                 className="max-w-[300px] line-clamp-2 font-medium"
             >
                 <Button variant="link" style={{ padding: 0 }}>
@@ -33,6 +35,9 @@ export const vulnsColumns: ColumnDef<Repository>[] = [
                     </svg>
                     {row.original.fullName}
                 </Button>
+                {row.index === 0 && <Badge variant="secondary" className='mx-1'>
+                    latest
+                </Badge>}
             </Link>
         ),
         enableSorting: false,

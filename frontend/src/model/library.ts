@@ -120,9 +120,10 @@ export interface Repository {
     name: string
     fullName: string
     owner: string
+    defaultBranch: string
     isPublic: boolean
     githubUrl: string
-    language: boolean
+    language: string
     scanningResult?: ScanningResult
     userId?: string
     updatedBy?: string
@@ -148,4 +149,18 @@ export interface History {
     type: string
     createdAt: string
     repoId: string
+}
+
+export interface LibraryFix {
+    name: string
+    currentVersion: string
+    fixedVersion: string
+    ecosystem: string
+    severity: string
+}
+
+export interface FixResult {
+    libs: LibraryFix[]
+    ecosystem: string
+    responseTime: number
 }

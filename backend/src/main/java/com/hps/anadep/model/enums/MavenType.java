@@ -1,5 +1,6 @@
 package com.hps.anadep.model.enums;
 
+import com.hps.anadep.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,6 +17,6 @@ public enum MavenType {
                 return mavenType;
             }
         }
-        throw new RuntimeException(String.format("Cannot find [%s] Maven Type", name));
+        throw new NotFoundException(String.format("Cannot find [%s] Maven Type", name));
     }
 }

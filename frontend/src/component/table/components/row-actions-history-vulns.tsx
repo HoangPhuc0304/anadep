@@ -15,7 +15,6 @@ import {
 
 import {
     generateReport,
-    getRepoById,
     removeHistoryById,
 } from '../../../api/apiCall'
 import { ReportForm, Repository, User } from '../../../model/library'
@@ -54,7 +53,6 @@ import { RadioGroup, RadioGroupItem } from '../../ui/radio-group'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from 'react-router-dom'
 
 interface DataTableRowActionsProps<TData> {
     row: Row<Repository>
@@ -63,19 +61,13 @@ interface DataTableRowActionsProps<TData> {
 const formSchema = z.object({
     projectName: z
         .string()
-        .min(1, {
-            message: 'Project name must not be empty.',
-        })
         .max(100, {
             message: 'Project name must not be longer than 100 characters.',
         }),
     author: z
         .string()
-        .min(1, {
-            message: 'Author name must not be empty.',
-        })
-        .max(50, {
-            message: 'Author name must not be longer than 50 characters.',
+        .max(100, {
+            message: 'Author name must not be longer than 100 characters.',
         }),
     format: z.enum(['pdf', 'excel', 'json'], {
         required_error: 'You need to select a format.',
@@ -88,11 +80,14 @@ export function DataTableRowProjectActions<TData>({
     row,
 }: DataTableRowActionsProps<TData>) {
     const { toast } = useToast()
+    const user: User = useSelector((state: RootState) => state.user.currentUser)
     const form = useForm<ReportForm>({
         resolver: zodResolver(formSchema),
-        defaultValues,
+        defaultValues: {
+            projectName: row.original.fullName,
+            author: user.name || user.login,
+        },
     })
-    const user: User = useSelector((state: RootState) => state.user.currentUser)
 
     const handlingToastAction = (title: string, description: string) => {
         toast({
@@ -109,7 +104,7 @@ export function DataTableRowProjectActions<TData>({
             row.original.vulnerabilityResult.libs.length > 0
         ) {
             data = await generateReport(
-                row.original.vulnerabilityResult?.libs,
+                row.original.vulnerabilityResult,
                 reportData,
                 'vulns'
             )

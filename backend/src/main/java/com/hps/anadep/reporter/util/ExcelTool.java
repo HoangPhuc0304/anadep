@@ -1,9 +1,11 @@
 package com.hps.anadep.reporter.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hps.anadep.model.Library;
+import com.hps.anadep.model.depgraph.Dependency;
 import com.hps.anadep.model.enums.ReportType;
+import com.hps.anadep.model.response.ScanningResult;
+import com.hps.anadep.model.ui.AnalysisUIResult;
 import com.hps.anadep.model.ui.LibraryScanUI;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +15,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -25,21 +26,19 @@ import java.util.List;
 public class ExcelTool extends ReportTool {
 
     @Override
-    public void export(List<?> data, String projectName, String author, Class<?> classType, HttpServletResponse response) throws IOException {
+    public void export(Object data, String projectName, String author, Class<?> classType, HttpServletResponse response) throws IOException {
         initResponse(response, FILE_NAME, classType);
         ServletOutputStream out = response.getOutputStream();
         XSSFWorkbook workbook = new XSSFWorkbook();
         String[] headers;
         ObjectMapper objectMapper = new ObjectMapper();
 
-        if (classType == LibraryScanUI.class) {
+        if (classType == AnalysisUIResult.class) {
             headers = new String[]{"No.", "Database Id", "Package Name", "Version", "Summary", "Fix Version", "Severity", "Score"};
-            exportVulns(workbook, headers, projectName, author, objectMapper.convertValue(data, new TypeReference<List<LibraryScanUI>>() {
-            }));
+            exportVulns(workbook, headers, projectName, author, objectMapper.convertValue(data, AnalysisUIResult.class));
         } else {
             headers = new String[]{"No.", "Package Name", "Version", "Ecosystem"};
-            exportSbom(workbook, headers, projectName, author, objectMapper.convertValue(data, new TypeReference<List<Library>>() {
-            }));
+            exportSbom(workbook, headers, projectName, author, objectMapper.convertValue(data, ScanningResult.class));
         }
         workbook.write(out);
         workbook.close();
@@ -53,7 +52,7 @@ public class ExcelTool extends ReportTool {
 
         String headerKey = "Content-Disposition";
         String reportType;
-        if (classType == LibraryScanUI.class) {
+        if (classType == AnalysisUIResult.class) {
             reportType = ReportType.VULNS.name().toLowerCase();
         } else {
             reportType = ReportType.SBOM.name().toLowerCase();
@@ -63,22 +62,33 @@ public class ExcelTool extends ReportTool {
     }
 
 
-    private void exportVulns(XSSFWorkbook workbook, String[] headers, String projectName, String author, List<LibraryScanUI> libs) throws IOException {
+    private void exportVulns(XSSFWorkbook workbook, String[] headers, String projectName, String author, AnalysisUIResult analysisUIResult) throws IOException {
         XSSFSheet sheet = workbook.createSheet("Vulnerability Report");
-        if (CollectionUtils.isEmpty(libs)) {
+        if (CollectionUtils.isEmpty(analysisUIResult.getLibs())) {
             return;
         }
-        generateHeading(workbook, sheet, "Vulnerability Report", projectName, author, libs.get(0).getInfo().getEcosystem(), libs.size());
-        generateVulnsContent(workbook, sheet, headers, libs);
+        generateHeading(workbook, sheet, "Vulnerability Report", projectName, author, analysisUIResult.getEcosystem(), analysisUIResult.getLibs().size());
+        generateVulnsContent(workbook, sheet, headers, analysisUIResult.getLibs(), 7);
     }
 
-    private void exportSbom(XSSFWorkbook workbook, String[] headers, String projectName, String author, List<Library> libs) throws IOException {
+    private void exportSbom(XSSFWorkbook workbook, String[] headers, String projectName, String author, ScanningResult scanningResult) throws IOException {
         XSSFSheet sheet = workbook.createSheet("SBOM Report");
-        if (CollectionUtils.isEmpty(libs)) {
+        if (CollectionUtils.isEmpty(scanningResult.getLibraries())) {
             return;
         }
-        generateHeading(workbook, sheet, "SBOM Report", projectName, author, libs.get(0).getEcosystem(), libs.size());
-        generateSbomContent(workbook, sheet, headers, libs);
+        generateHeading(workbook, sheet, "SBOM Report", projectName, author, scanningResult.getEcosystem(), scanningResult.getLibraryCount());
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFont(getFontHeader(workbook));
+
+        Row rowLibrary = sheet.createRow(7);
+        createCell(sheet, rowLibrary, 0, "Libraries", cellStyle);
+        generateSbomContent(workbook, sheet, headers, scanningResult.getLibraries(), 8);
+
+        int rowNumber = scanningResult.getLibraries().size() + 10;
+        Row rowDependency = sheet.createRow(rowNumber);
+        createCell(sheet, rowDependency, 0, "Dependencies", cellStyle);
+        String[] dependencyHeaders = new String[]{"No.", "From", "To", "Numeric From", "Numeric To", "Resolution"};
+        generateDependenciesContent(workbook, sheet, dependencyHeaders, scanningResult.getDependencies(), rowNumber + 1);
     }
 
     private void generateHeading(XSSFWorkbook workbook, XSSFSheet sheet, String title, String projectName, String author, String ecosystem, int libs) throws IOException {
@@ -105,8 +115,8 @@ public class ExcelTool extends ReportTool {
         }
     }
 
-    private void generateVulnsContent(XSSFWorkbook workbook, XSSFSheet sheet, String[] headers, List<LibraryScanUI> libs) {
-        writeTableHeader(workbook, sheet, headers);
+    private void generateVulnsContent(XSSFWorkbook workbook, XSSFSheet sheet, String[] headers, List<LibraryScanUI> libs, int rowNumber) {
+        writeTableHeader(workbook, sheet, headers, rowNumber);
 
         List<String[]> data = new ArrayList<>();
         int number = 1;
@@ -123,11 +133,11 @@ public class ExcelTool extends ReportTool {
             });
             number++;
         }
-        writeTableData(workbook, sheet, data);
+        writeTableData(workbook, sheet, data, rowNumber + 1);
     }
 
-    private void generateSbomContent(XSSFWorkbook workbook, XSSFSheet sheet, String[] headers, List<Library> libs) {
-        writeTableHeader(workbook, sheet, headers);
+    private void generateSbomContent(XSSFWorkbook workbook, XSSFSheet sheet, String[] headers, Set<Library> libs, int rowNumber) {
+        writeTableHeader(workbook, sheet, headers, rowNumber);
 
         List<String[]> data = new ArrayList<>();
         int number = 1;
@@ -140,13 +150,32 @@ public class ExcelTool extends ReportTool {
             });
             number++;
         }
-        writeTableData(workbook, sheet, data);
+        writeTableData(workbook, sheet, data, rowNumber + 1);
     }
 
-    public void writeTableHeader(XSSFWorkbook workbook, XSSFSheet sheet, String[] headers) {
+    private void generateDependenciesContent(XSSFWorkbook workbook, XSSFSheet sheet, String[] headers, Set<Dependency> dependencies, int rowNumber) {
+        writeTableHeader(workbook, sheet, headers, rowNumber);
+
+        List<String[]> data = new ArrayList<>();
+        int number = 1;
+        for (Dependency dep : dependencies) {
+            data.add(new String[]{
+                    String.valueOf(number),
+                    dep.getFrom(),
+                    dep.getTo(),
+                    String.valueOf(dep.getNumericFrom()),
+                    String.valueOf(dep.getNumericTo()),
+                    dep.getResolution(),
+            });
+            number++;
+        }
+        writeTableData(workbook, sheet, data, rowNumber + 1);
+    }
+
+    public void writeTableHeader(XSSFWorkbook workbook, XSSFSheet sheet, String[] headers, int rowNumber) {
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setFont(getFontHeader(workbook));
-        Row row = sheet.createRow(7);
+        Row row = sheet.createRow(rowNumber);
 
         int i = 0;
         for (String header : headers) {
@@ -155,11 +184,11 @@ public class ExcelTool extends ReportTool {
         }
     }
 
-    public void writeTableData(XSSFWorkbook workbook, XSSFSheet sheet, List<String[]> data) {
+    public void writeTableData(XSSFWorkbook workbook, XSSFSheet sheet, List<String[]> data, int rowNumber) {
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setFont(getFontContent(workbook));
 
-        int rowNum = 8;
+        int rowNum = rowNumber;
         for (String[] rowData : data) {
             Row row = sheet.createRow(rowNum);
             int colNum = 0;

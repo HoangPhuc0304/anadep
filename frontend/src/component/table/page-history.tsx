@@ -13,6 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { sbomColumns } from './components/columns-history-sbom'
 import { vulnsColumns } from './components/columns-history-vulns'
 import { DataTable } from './components/data-table-history'
+import { Button } from '../ui/button'
+import { Link } from 'react-router-dom'
+import { GitPullRequestArrow } from 'lucide-react'
 
 export default function HistoryPage({
     repo,
@@ -30,10 +33,10 @@ export default function HistoryPage({
         () =>
             vulnsLoading
                 ? vulnsColumns.map((column) => ({
-                      ...column,
-                      accessorFn: () => '',
-                      cell: () => <Skeleton className="h-[40px] w-full" />,
-                  }))
+                    ...column,
+                    accessorFn: () => '',
+                    cell: () => <Skeleton className="h-[40px] w-full" />,
+                }))
                 : vulnsColumns,
         [vulnsLoading, vulnsColumns]
     )
@@ -41,10 +44,10 @@ export default function HistoryPage({
         () =>
             sbomLoading
                 ? sbomColumns.map((column) => ({
-                      ...column,
-                      accessorFn: () => '',
-                      cell: () => <Skeleton className="h-[40px] w-full" />,
-                  }))
+                    ...column,
+                    accessorFn: () => '',
+                    cell: () => <Skeleton className="h-[40px] w-full" />,
+                }))
                 : sbomColumns,
         [sbomLoading, sbomColumns]
     )
@@ -109,10 +112,12 @@ export default function HistoryPage({
                             id: any
                             scanningResult: any
                             updatedBy: any
+                            createdAt: any
                         }) => ({
                             ...repo,
                             scanningResult: h.scanningResult,
                             updatedBy: h.updatedBy,
+                            createdAt: new Date(h.createdAt).toLocaleString(),
                             historyId: h.id,
                         })
                     )

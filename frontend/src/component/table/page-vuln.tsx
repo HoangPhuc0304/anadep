@@ -14,7 +14,7 @@ import { severities } from '../../data/helper'
 import {
     generateReport,
     getAnalysisUIResult,
-    updateRepoWithVulns,
+    getAuthAnalysisUIResult,
 } from '../../api/apiCall'
 import { ToastAction } from '../ui/toast'
 import { useToast } from '../ui/use-toast'
@@ -53,10 +53,10 @@ export default function VulnerabilityPage({
         () =>
             loading
                 ? columns.map((column) => ({
-                      ...column,
-                      accessorFn: () => '',
-                      cell: () => <Skeleton className="h-[40px] w-full" />,
-                  }))
+                    ...column,
+                    accessorFn: () => '',
+                    cell: () => <Skeleton className="h-[40px] w-full" />,
+                }))
                 : columns,
         [loading, columns]
     )
@@ -71,21 +71,22 @@ export default function VulnerabilityPage({
 
     const fetchData = async () => {
         if (file) {
-            const data = await getAnalysisUIResult(file)
+            let data = ''
+            if (repo && repo.id && user.githubToken) {
+                data = await getAuthAnalysisUIResult(file, repo.id, user.githubToken)
+            } else {
+                data = await getAnalysisUIResult(file)
+            }
+
             if (typeof data === 'string') {
-                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
                 dispatch(update({ ...analysisUIResult, libs: [] }))
+                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
             } else {
                 dispatch(update(data))
                 handlingToastAction(
                     SUCCESS_LABEL,
                     VULN_ANALYSIS_SUCCESS_MESSAGE
                 )
-                if (repo && data.libs) {
-                    if (data.libs.length > 0) {
-                        handlingUpdateRepo(data)
-                    }
-                }
             }
             setLoading(false)
         }
@@ -94,7 +95,7 @@ export default function VulnerabilityPage({
     const handlingReport = async () => {
         if (reportData && analysisUIResult.libs.length > 0) {
             const data: string | boolean = await generateReport(
-                analysisUIResult.libs,
+                analysisUIResult,
                 reportData,
                 'vulns'
             )
@@ -105,19 +106,6 @@ export default function VulnerabilityPage({
                     SUCCESS_LABEL,
                     GENERATE_REPORT_SUCCESS_MESSAGE
                 )
-            }
-        }
-    }
-
-    const handlingUpdateRepo = async (result: AnalysisUIResult) => {
-        if (repo && user.githubToken) {
-            const data = await updateRepoWithVulns(
-                repo,
-                result,
-                user.githubToken
-            )
-            if (typeof data === 'string' && data.length !== 0) {
-                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
             }
         }
     }

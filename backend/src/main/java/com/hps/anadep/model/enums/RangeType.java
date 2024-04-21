@@ -1,5 +1,7 @@
 package com.hps.anadep.model.enums;
 
+import com.hps.anadep.exception.NotFoundException;
+
 public enum RangeType {
     ECOSYSTEM, SEMVER, GIT;
 
@@ -9,6 +11,6 @@ public enum RangeType {
                 return rangeType;
             }
         }
-        throw new RuntimeException(String.format("Cannot find [%s] RangeType", rangeTypeStr));
+        throw new NotFoundException(String.format("Cannot find [%s] RangeType", rangeTypeStr));
     }
 }

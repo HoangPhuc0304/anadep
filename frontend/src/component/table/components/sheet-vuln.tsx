@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom'
 import { Badge } from '../../ui/badge'
 import { severities } from '../../../data/helper'
 import { ScrollArea } from '../../ui/scroll-area'
+import ReactMarkdown from 'react-markdown'
 
 const VulnerabilityDetailSheetContent: React.FC<{ lib: LibraryScanUI }> = ({
     lib,
@@ -60,12 +61,16 @@ const VulnerabilityDetailSheetContent: React.FC<{ lib: LibraryScanUI }> = ({
                     </div>
                     <div className="grid grid-cols-4 gap-4">
                         <span className="items-start font-bold">Details</span>
-                        <span className="col-span-3">{lib.vuln.details}</span>
+                        <span className="col-span-3">
+                            <ReactMarkdown>
+                                {lib.vuln.details}
+                            </ReactMarkdown>
+                        </span>
                     </div>
                     <div className="grid grid-cols-4 items-start gap-4">
                         <span className="items-start font-bold">Aliases</span>
                         <span className="col-span-3">
-                            {lib.vuln.aliases.map((alias, index) => (
+                            {lib.vuln?.aliases?.map((alias, index) => (
                                 <Badge key={index} className="mx-1">
                                     {alias}
                                 </Badge>
@@ -110,7 +115,7 @@ const VulnerabilityDetailSheetContent: React.FC<{ lib: LibraryScanUI }> = ({
                             References
                         </span>
                         <div className="col-span-3">
-                            {lib.vuln.references.map((refer, index) => (
+                            {lib.vuln?.references?.map((refer, index) => (
                                 <Link
                                     key={index}
                                     to={refer?.url || '#'}

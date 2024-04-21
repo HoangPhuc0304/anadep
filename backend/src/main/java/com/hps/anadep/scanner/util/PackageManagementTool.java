@@ -1,13 +1,9 @@
 package com.hps.anadep.scanner.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hps.anadep.model.Library;
-
-import java.util.Map;
-import java.util.Set;
+import com.hps.anadep.model.response.ScanningResult;
+import com.hps.anadep.model.response.SummaryFix;
 
 public interface PackageManagementTool {
-    Set<Library> getDependencies(boolean includeTransitive, String namespace) throws Exception;
-    boolean isUseLibrary(Map.Entry<Library, String> libraryMap, Library lib) throws JsonProcessingException;
-    Map<Library, String> getDependencyMap(String namespace) throws Exception;
+    ScanningResult getDependencies(boolean includeTransitive, String namespace) throws Exception;
+    void createFixFile(SummaryFix summaryFix, String fileName) throws Exception;
 }

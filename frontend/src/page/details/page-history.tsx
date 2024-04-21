@@ -29,7 +29,7 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from '../../component/ui/breadcrumb'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { History, Repository, User } from '../../model/library'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../redux/store'
@@ -90,8 +90,9 @@ export function HistoryDetails() {
     const { toast } = useToast()
     const [repo, setRepo] = React.useState<Repository>()
     const [history, setHistory] = React.useState<History>()
-
     const { repoId, id } = useParams()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const fixAvailable = searchParams.get('fixAvailable');
 
     const user: User = useSelector((state: RootState) => state.user.currentUser)
 
@@ -292,7 +293,7 @@ export function HistoryDetails() {
                         </div>
                     </Tabs>
                     {history?.type.toLocaleLowerCase() === 'vulns' ? (
-                        <HistoryVulnsPage repo={repo} history={history} />
+                        <HistoryVulnsPage repo={repo} history={history} fixAvailable={fixAvailable}/>
                     ) : (
                         <HistorySbomPage repo={repo} history={history} />
                     )}

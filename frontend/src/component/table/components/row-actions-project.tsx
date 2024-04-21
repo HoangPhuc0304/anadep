@@ -16,13 +16,10 @@ import {
 import {
     downloadFileFormGitHubUrl,
     generateReport,
-    getAnalysisUIResult,
-    getRepoById,
+    getAuthAnalysisUIResult,
     removeRepoById,
-    updateRepoWithVulns,
 } from '../../../api/apiCall'
 import {
-    AnalysisUIResult,
     ReportForm,
     Repository,
     User,
@@ -37,7 +34,7 @@ import {
     GENERATE_REPORT_SUCCESS_MESSAGE,
     REMOVE_PROJECT_SUCCESS_MESSAGE,
     SUCCESS_LABEL,
-    UPDATE_PROJECT_SUCCESS_MESSAGE,
+    VULN_ANALYSIS_SUCCESS_MESSAGE,
 } from '../../../common/common'
 import { update } from '../../../redux/slice/vulnScanSlice'
 import {
@@ -64,8 +61,6 @@ import { RadioGroup, RadioGroupItem } from '../../../component/ui/radio-group'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
 
 interface DataTableRowActionsProps<TData> {
     row: Row<Repository>
@@ -74,19 +69,13 @@ interface DataTableRowActionsProps<TData> {
 const formSchema = z.object({
     projectName: z
         .string()
-        .min(1, {
-            message: 'Project name must not be empty.',
-        })
         .max(100, {
             message: 'Project name must not be longer than 100 characters.',
         }),
     author: z
         .string()
-        .min(1, {
-            message: 'Author name must not be empty.',
-        })
-        .max(50, {
-            message: 'Author name must not be longer than 50 characters.',
+        .max(100, {
+            message: 'Author name must not be longer than 100 characters.',
         }),
     type: z.enum(['vulns', 'sbom'], {
         required_error: 'You need to select a type.',
@@ -103,11 +92,14 @@ export function DataTableRowProjectActions<TData>({
 }: DataTableRowActionsProps<TData>) {
     const { toast } = useToast()
     const dispatch = useDispatch()
+    const user: User = useSelector((state: RootState) => state.user.currentUser)
     const form = useForm<ReportForm>({
         resolver: zodResolver(formSchema),
-        defaultValues,
+        defaultValues: {
+            projectName: row.original.fullName,
+            author: user.name || user.login,
+        },
     })
-    const user: User = useSelector((state: RootState) => state.user.currentUser)
 
     const handlingToastAction = (title: string, description: string) => {
         toast({
@@ -115,33 +107,6 @@ export function DataTableRowProjectActions<TData>({
             description,
             action: <ToastAction altText="Hide">Hide</ToastAction>,
         })
-    }
-
-    const handlingUpdateRepo = async (result: AnalysisUIResult) => {
-        if (row.original.id && user.githubToken) {
-            const repoData = await getRepoById(
-                row.original.id,
-                user.githubToken
-            )
-            if (repoData && user.githubToken) {
-                const data = await updateRepoWithVulns(
-                    repoData,
-                    result,
-                    user.githubToken
-                )
-                if (typeof data === 'string' && data.length !== 0) {
-                    handlingToastAction(
-                        ERROR_LABEL,
-                        data || DEFAULT_ERROR_MESSAGE
-                    )
-                } else {
-                    handlingToastAction(
-                        SUCCESS_LABEL,
-                        UPDATE_PROJECT_SUCCESS_MESSAGE
-                    )
-                }
-            }
-        }
     }
 
     const handlingBuild = async () => {
@@ -162,10 +127,11 @@ export function DataTableRowProjectActions<TData>({
                 )
                 return
             }
+
             const blob = new Blob([downloadData], { type: 'application/zip' })
             const file = new File([blob], 'source.zip')
-            if (file) {
-                const analysisData = await getAnalysisUIResult(file)
+            if (file && row.original.id) {
+                const analysisData = await getAuthAnalysisUIResult(file, row.original.id, user.githubToken)
                 if (typeof analysisData === 'string') {
                     handlingToastAction(
                         ERROR_LABEL,
@@ -173,11 +139,10 @@ export function DataTableRowProjectActions<TData>({
                     )
                 } else {
                     dispatch(update(analysisData))
-                    if (analysisData.libs) {
-                        if (analysisData.libs.length > 0) {
-                            handlingUpdateRepo(analysisData)
-                        }
-                    }
+                    handlingToastAction(
+                        SUCCESS_LABEL,
+                        VULN_ANALYSIS_SUCCESS_MESSAGE
+                    )
                 }
             }
         } else {
@@ -193,7 +158,7 @@ export function DataTableRowProjectActions<TData>({
                 row.original.vulnerabilityResult?.libs.length > 0
             ) {
                 data = await generateReport(
-                    row.original.vulnerabilityResult?.libs,
+                    row.original.vulnerabilityResult,
                     reportData,
                     'vulns'
                 )
@@ -204,7 +169,7 @@ export function DataTableRowProjectActions<TData>({
                 row.original.scanningResult?.libraries.length > 0
             ) {
                 data = await generateReport(
-                    row.original.scanningResult?.libraries,
+                    row.original.scanningResult,
                     reportData,
                     'sbom'
                 )

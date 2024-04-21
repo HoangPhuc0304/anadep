@@ -15,6 +15,7 @@ public class SummaryLibraryFix {
     private String ecosystem;
     private String fixedVersion;
     private Set<Library> usedBy;
+    private String severity;
     private String description;
 
     @JsonSetter("ecosystem")
@@ -27,6 +28,7 @@ public class SummaryLibraryFix {
         this.currentVersion = library.getCurrentVersion();
         this.ecosystem = library.getEcosystem();
         this.fixedVersion = library.getFixedVersion();
+        this.severity = library.getSeverity();
         this.usedBy = usedBy;
         this.description = description;
     }

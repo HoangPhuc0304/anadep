@@ -13,6 +13,7 @@ import { ToastAction } from '../../component/ui/toast'
 import { useToast } from '../../component/ui/use-toast'
 import { DEFAULT_ERROR_MESSAGE, ERROR_LABEL } from '../../common/common'
 import { Skeleton } from '../../component/ui/skeleton'
+import ReactMarkdown from 'react-markdown'
 
 export default function DetailsPage() {
     const [vuln, setVuln] = useState<VulnerabilityResponse>()
@@ -104,7 +105,9 @@ export default function DetailsPage() {
                                     <Skeleton className="h-[24px] w-full" />
                                 ) : (
                                     <span className="col-span-3">
-                                        {vuln?.details}
+                                        <ReactMarkdown>
+                                            {vuln?.details}
+                                        </ReactMarkdown>
                                     </span>
                                 )}
                             </div>

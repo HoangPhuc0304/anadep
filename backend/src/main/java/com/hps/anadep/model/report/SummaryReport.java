@@ -17,4 +17,5 @@ public class SummaryReport {
     private String ecosystem;
     private int amount;
     private List<?> data;
+    private List<?> dependencies;
 }

@@ -6,8 +6,10 @@ import com.hps.anadep.model.osv.Vulnerability;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.ui.AnalysisUIResult;
 import com.hps.anadep.model.ui.VulnerabilitySummary;
+import com.hps.anadep.security.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +39,16 @@ public class UiController {
         return uiService.scan(file, includeTransitive);
     }
 
+    @PostMapping("/ui/scan/repo/{repoId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ScanningResult scan(@PathVariable("repoId") String repoId,
+                               @RequestParam("file") MultipartFile file,
+                               @RequestParam(value = "includeTransitive", defaultValue = "true") boolean includeTransitive,
+                               @AuthenticationPrincipal AppUser appUser)
+            throws Exception {
+        return uiService.scan(repoId, file, includeTransitive, appUser);
+    }
+
     @PostMapping("/ui/analyze")
     @ResponseStatus(HttpStatus.OK)
     public AnalysisUIResult analyze(@RequestParam("file") MultipartFile file)
@@ -44,11 +56,29 @@ public class UiController {
         return uiService.analyze(file, false);
     }
 
+    @PostMapping("/ui/analyze/repo/{repoId}")
+    @ResponseStatus(HttpStatus.OK)
+    public AnalysisUIResult analyze(@PathVariable("repoId") String repoId,
+                                    @RequestParam("file") MultipartFile file,
+                                    @AuthenticationPrincipal AppUser appUser)
+            throws Exception {
+        return uiService.analyze(repoId, file, false, appUser);
+    }
+
     @PostMapping("/ui/analyze/v2")
     @ResponseStatus(HttpStatus.OK)
     public AnalysisUIResult analyzeV2(@RequestParam("file") MultipartFile file)
             throws Exception {
         return uiService.analyzeV2(file, false);
+    }
+
+    @PostMapping("/ui/analyze/v2/repo/{repoId}")
+    @ResponseStatus(HttpStatus.OK)
+    public AnalysisUIResult analyzeV2(@PathVariable("repoId") String repoId,
+                                    @RequestParam("file") MultipartFile file,
+                                    @AuthenticationPrincipal AppUser appUser)
+            throws Exception {
+        return uiService.analyzeV2(repoId, file, false, appUser);
     }
 
     @GetMapping("/ui/repo/download")

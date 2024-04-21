@@ -1,9 +1,11 @@
 package com.hps.anadep.reporter.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hps.anadep.model.Library;
+import com.hps.anadep.model.depgraph.Dependency;
 import com.hps.anadep.model.enums.ReportType;
+import com.hps.anadep.model.response.ScanningResult;
+import com.hps.anadep.model.ui.AnalysisUIResult;
 import com.hps.anadep.model.ui.LibraryScanUI;
 import com.hps.anadep.reporter.service.helper.HeaderAndFooterPageEventHelper;
 import com.lowagie.text.*;
@@ -11,7 +13,6 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -20,11 +21,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public class PdfTool extends ReportTool {
 
     @Override
-    public void export(List<?> data, String projectName, String author, Class<?> classType, HttpServletResponse response) throws IOException {
+    public void export(Object data, String projectName, String author, Class<?> classType, HttpServletResponse response) throws IOException {
         response = initResponse(response, FILE_NAME, classType);
         Document document = new Document(PageSize.A4.rotate());
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
@@ -33,14 +35,12 @@ public class PdfTool extends ReportTool {
         document.open();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        if (classType == LibraryScanUI.class) {
+        if (classType == AnalysisUIResult.class) {
             headers = new String[]{"No.", "Database Id", "Package Name", "Version", "Summary", "Fix Version", "Severity", "Score"};
-            exportVulns(document, headers, projectName, author, objectMapper.convertValue(data, new TypeReference<List<LibraryScanUI>>() {
-            }));
+            exportVulns(document, headers, projectName, author, objectMapper.convertValue(data, AnalysisUIResult.class));
         } else {
             headers = new String[]{"No.", "Package Name", "Version", "Ecosystem"};
-            exportSbom(document, headers, projectName, author, objectMapper.convertValue(data, new TypeReference<List<Library>>() {
-            }));
+            exportSbom(document, headers, projectName, author, objectMapper.convertValue(data, ScanningResult.class));
         }
         document.close();
     }
@@ -62,20 +62,34 @@ public class PdfTool extends ReportTool {
         return response;
     }
 
-    private void exportVulns(Document document, String[] headers, String projectName, String author, List<LibraryScanUI> libs) throws IOException {
-        if (CollectionUtils.isEmpty(libs)) {
+    private void exportVulns(Document document, String[] headers, String projectName, String author, AnalysisUIResult analysisUIResult) throws IOException {
+        if (CollectionUtils.isEmpty(analysisUIResult.getLibs())) {
             return;
         }
-        generateHeading(document, "Vulnerability Report", projectName, author, libs.get(0).getInfo().getEcosystem(), libs.size());
-        generateVulnsContent(document, headers, libs);
+        generateHeading(document, "Vulnerability Report", projectName, author, analysisUIResult.getEcosystem(), analysisUIResult.getLibs().size());
+        generateVulnsContent(document, headers, analysisUIResult.getLibs());
     }
 
-    private void exportSbom(Document document, String[] headers, String projectName, String author, List<Library> libs) throws IOException {
-        if (CollectionUtils.isEmpty(libs)) {
+    private void exportSbom(Document document, String[] headers, String projectName, String author, ScanningResult scanningResult) throws IOException {
+        if (CollectionUtils.isEmpty(scanningResult.getLibraries())) {
             return;
         }
-        generateHeading(document, "SBOM Report", projectName, author, libs.get(0).getEcosystem(), libs.size());
-        generateSbomContent(document, headers, libs);
+        generateHeading(document, "SBOM Report", projectName, author, scanningResult.getEcosystem(), scanningResult.getLibraryCount());
+        enterSpace(document);
+
+        Paragraph libParagraph = new Paragraph("Libraries:", getFontHeader());
+        libParagraph.setAlignment(Paragraph.ALIGN_LEFT);
+        document.add(libParagraph);
+        enterSpace(document);
+        generateSbomContent(document, headers, scanningResult.getLibraries());
+        enterSpace(document);
+
+        Paragraph depParagraph = new Paragraph("Dependencies:", getFontHeader());
+        depParagraph.setAlignment(Paragraph.ALIGN_LEFT);
+        document.add(depParagraph);
+        enterSpace(document);
+        String[] dependencyHeaders = new String[]{"No.", "From", "To", "Numeric From", "Numeric To", "Resolution"};
+        generateDependenciesContent(document, dependencyHeaders, scanningResult.getDependencies());
     }
 
     private void generateHeading(Document document, String title, String projectName, String author, String ecosystem, int libs) throws IOException {
@@ -144,7 +158,7 @@ public class PdfTool extends ReportTool {
         document.add(tableData);
     }
 
-    private void generateSbomContent(Document document, String[] headers, List<Library> libs) {
+    private void generateSbomContent(Document document, String[] headers, Set<Library> libs) {
         PdfPTable tableHeader = new PdfPTable(headers.length);
         writeTableHeaderPdf(tableHeader, headers);
         document.add(tableHeader);
@@ -159,6 +173,30 @@ public class PdfTool extends ReportTool {
                     lib.getName(),
                     lib.getVersion(),
                     lib.getEcosystem()
+            });
+            number++;
+        }
+        writeTableData(tableData, data);
+        document.add(tableData);
+    }
+
+    private void generateDependenciesContent(Document document, String[] headers, Set<Dependency> dependencies) {
+        PdfPTable tableHeader = new PdfPTable(headers.length);
+        writeTableHeaderPdf(tableHeader, headers);
+        document.add(tableHeader);
+
+        // table content
+        PdfPTable tableData = new PdfPTable(headers.length);
+        List<String[]> data = new ArrayList<>();
+        int number = 1;
+        for (Dependency dep : dependencies) {
+            data.add(new String[]{
+                    String.valueOf(number),
+                    dep.getFrom(),
+                    dep.getTo(),
+                    String.valueOf(dep.getNumericFrom()),
+                    String.valueOf(dep.getNumericTo()),
+                    dep.getResolution(),
             });
             number++;
         }

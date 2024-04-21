@@ -80,10 +80,22 @@ export const sbomColumns: ColumnDef<Repository>[] = [
         enableSorting: false,
     },
     {
-        accessorKey: 'responseTime',
+        accessorKey: 'analysisTime',
+        accessorFn: (row) => row.createdAt,
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Analysis Time" />
+        ),
+        cell: ({ row }) => (
+            <div className="max-w-[200px] line-clamp-2 font-medium">
+                {row.original.createdAt}
+            </div>
+        ),
+    },
+    {
+        accessorKey: 'duration',
         accessorFn: (row) => row.scanningResult?.responseTime,
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Response Time" />
+            <DataTableColumnHeader column={column} title="Duration (ms)" />
         ),
         cell: ({ row }) => (
             <div className="max-w-[200px] line-clamp-2 font-medium">

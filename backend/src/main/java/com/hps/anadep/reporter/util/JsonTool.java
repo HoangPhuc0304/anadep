@@ -1,10 +1,10 @@
 package com.hps.anadep.reporter.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hps.anadep.model.Library;
 import com.hps.anadep.model.enums.ReportType;
 import com.hps.anadep.model.report.SummaryReport;
+import com.hps.anadep.model.response.ScanningResult;
+import com.hps.anadep.model.ui.AnalysisUIResult;
 import com.hps.anadep.model.ui.LibraryScanUI;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,25 +14,23 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 public class JsonTool extends ReportTool {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void export(List<?> data, String projectName, String author, Class<?> classType, HttpServletResponse response) throws Exception {
+    public void export(Object data, String projectName, String author, Class<?> classType, HttpServletResponse response) throws Exception {
         response = initResponse(response, FILE_NAME, classType);
         ServletOutputStream out = response.getOutputStream();
 
-        if (classType == LibraryScanUI.class) {
-            List<LibraryScanUI> libs = objectMapper.convertValue(data, new TypeReference<List<LibraryScanUI>>() {
-            });
-            exportVulns(libs, projectName, author, out);
+        if (classType == AnalysisUIResult.class) {
+            AnalysisUIResult analysisUIResult = objectMapper.convertValue(data, AnalysisUIResult.class);
+            exportVulns(analysisUIResult, projectName, author, out);
         } else {
-            List<Library> libs = objectMapper.convertValue(data, new TypeReference<List<Library>>() {
-            });
-            exportSbom(libs, projectName, author, out);
+            ScanningResult scanningResult = objectMapper.convertValue(data, ScanningResult.class);
+            exportSbom(scanningResult, projectName, author, out);
         }
         out.close();
     }
@@ -44,7 +42,7 @@ public class JsonTool extends ReportTool {
 
         String headerKey = "Content-Disposition";
         String reportType;
-        if (classType == LibraryScanUI.class) {
+        if (classType == AnalysisUIResult.class) {
             reportType = ReportType.VULNS.name().toLowerCase();
         } else {
             reportType = ReportType.SBOM.name().toLowerCase();
@@ -54,8 +52,8 @@ public class JsonTool extends ReportTool {
         return response;
     }
 
-    private void exportVulns(List<LibraryScanUI> libs, String projectName, String author, ServletOutputStream out) throws Exception {
-        if (CollectionUtils.isEmpty(libs)) {
+    private void exportVulns(AnalysisUIResult analysisUIResult, String projectName, String author, ServletOutputStream out) throws Exception {
+        if (CollectionUtils.isEmpty(analysisUIResult.getLibs())) {
             return;
         }
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss");
@@ -64,9 +62,11 @@ public class JsonTool extends ReportTool {
                 projectName,
                 author,
                 "Vulnerability Report",
-                currentDateTime, libs.get(0).getInfo().getEcosystem(),
-                libs.size(),
-                libs
+                currentDateTime,
+                analysisUIResult.getEcosystem(),
+                analysisUIResult.getLibs().size(),
+                analysisUIResult.getLibs(),
+                Collections.emptyList()
         );
 
         try (InputStream in = new ByteArrayInputStream(objectMapper.writeValueAsString(summaryReport).getBytes(StandardCharsets.UTF_8))) {
@@ -78,8 +78,8 @@ public class JsonTool extends ReportTool {
         }
     }
 
-    private void exportSbom(List<Library> libs, String projectName, String author, ServletOutputStream out) throws Exception {
-        if (CollectionUtils.isEmpty(libs)) {
+    private void exportSbom(ScanningResult scanningResult, String projectName, String author, ServletOutputStream out) throws Exception {
+        if (CollectionUtils.isEmpty(scanningResult.getLibraries())) {
             return;
         }
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss");
@@ -88,9 +88,11 @@ public class JsonTool extends ReportTool {
                 projectName,
                 author,
                 "SBOM Report",
-                currentDateTime, libs.get(0).getEcosystem(),
-                libs.size(),
-                libs
+                currentDateTime,
+                scanningResult.getEcosystem(),
+                scanningResult.getLibraryCount(),
+                scanningResult.getLibraries().stream().toList(),
+                scanningResult.getDependencies().stream().toList()
         );
 
         try (InputStream in = new ByteArrayInputStream(objectMapper.writeValueAsString(summaryReport).getBytes(StandardCharsets.UTF_8))) {
