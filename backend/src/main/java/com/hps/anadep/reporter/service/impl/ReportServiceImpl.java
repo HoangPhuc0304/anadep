@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 public class ReportServiceImpl implements ReportService {
     @Override
-    public void export(List<?> data, String projectName, String author, String type, String format, HttpServletResponse response) throws Exception {
+    public void export(Object data, String projectName, String author, String type, String format, HttpServletResponse response) throws Exception {
         ReportType reportType = ReportType.getReportType(type);
         Format reportFormat = Format.getFormat(format);
         ReportTool reportTool = reportFormat.getTool();

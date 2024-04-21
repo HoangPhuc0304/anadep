@@ -1,0 +1,67 @@
+{
+  "id": "MAL-2023-8450",
+  "summary": "Malicious code in airslate-static (npm)",
+  "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: ghsa-malware (187dae9cdc21ec49b7d2dd1609dcfe155123738e42a66793b16990e78bb18225)\nAny computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.\n",
+  "aliases": [
+    "GHSA-383r-5vjc-3jx8"
+  ],
+  "modified": "2023-11-08T04:14:30.459919Z",
+  "published": "2023-11-06T12:17:21Z",
+  "database_specific": {
+    "malicious-packages-origins": [
+      {
+        "modified_time": "2023-11-06T12:17:21Z",
+        "import_time": "2023-11-07T00:24:19.521154241Z",
+        "id": "GHSA-383r-5vjc-3jx8",
+        "ranges": [
+          {
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ],
+            "type": "SEMVER"
+          }
+        ],
+        "source": "ghsa-malware",
+        "sha256": "187dae9cdc21ec49b7d2dd1609dcfe155123738e42a66793b16990e78bb18225"
+      }
+    ]
+  },
+  "references": [
+    {
+      "type": "ADVISORY",
+      "url": "https://github.com/advisories/GHSA-383r-5vjc-3jx8"
+    }
+  ],
+  "affected": [
+    {
+      "package": {
+        "name": "airslate-static",
+        "ecosystem": "npm",
+        "purl": "pkg:npm/airslate-static"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            }
+          ]
+        }
+      ],
+      "database_specific": {
+        "cwes": [
+          {
+            "description": "The product contains code that appears to be malicious in nature.",
+            "cweId": "CWE-506",
+            "name": "Embedded Malicious Code"
+          }
+        ],
+        "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/airslate-static/MAL-2023-8450.json"
+      }
+    }
+  ],
+  "schema_version": "1.6.0"
+}

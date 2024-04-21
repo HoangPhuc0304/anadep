@@ -15,8 +15,8 @@ import { Skeleton } from '../ui/skeleton'
 import { ToastAction } from '../ui/toast'
 import {
     generateReport,
+    getAuthScanUIResult,
     getScanUIResult,
-    updateRepoWithSbom,
 } from '../../api/apiCall'
 import {
     DEFAULT_ERROR_MESSAGE,
@@ -71,7 +71,13 @@ export default function SbomPage({
 
     const fetchData = async () => {
         if (file) {
-            const data = await getScanUIResult(file)
+            let data = ''
+            if (repo && repo.id && user.githubToken) {
+                data = await getAuthScanUIResult(file, repo.id, user.githubToken)
+            } else {
+                data = await getScanUIResult(file)
+            }
+
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
                 dispatch(update({ ...scanningResult, libraries: [] }))
@@ -81,11 +87,6 @@ export default function SbomPage({
                     SUCCESS_LABEL,
                     DEPENDENCY_SCAN_SUCCESS_MESSAGE
                 )
-                if (repo && data.libraries) {
-                    if (data.libraries.length > 0) {
-                        handlingUpdateRepo(data)
-                    }
-                }
             }
             setLoading(false)
         }
@@ -94,7 +95,7 @@ export default function SbomPage({
     const handlingReport = async () => {
         if (reportData && scanningResult.libraries.length > 0) {
             const data: string | boolean = await generateReport(
-                scanningResult.libraries,
+                scanningResult,
                 reportData,
                 'sbom'
             )
@@ -105,19 +106,6 @@ export default function SbomPage({
                     SUCCESS_LABEL,
                     GENERATE_REPORT_SUCCESS_MESSAGE
                 )
-            }
-        }
-    }
-
-    const handlingUpdateRepo = async (result: ScanningResult) => {
-        if (repo && user.githubToken) {
-            const data = await updateRepoWithSbom(
-                repo,
-                result,
-                user.githubToken
-            )
-            if (typeof data === 'string' && data.length !== 0) {
-                handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
             }
         }
     }

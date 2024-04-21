@@ -34,6 +34,8 @@ public class Repo {
 
     private String githubUrl;
 
+    private String defaultBranch;
+
     private String language;
 
     @ManyToOne(fetch = FetchType.EAGER)

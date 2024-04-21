@@ -58,8 +58,14 @@ export default function SearchingPage({
     }
 
     const fetchData = async () => {
-        const packageName = name.slice(0, name.lastIndexOf(':'))
-        const version = name.slice(name.lastIndexOf(':') + 1)
+        let packageName
+        let version = null
+        if (name.indexOf('?') > -1) {
+            packageName = name.slice(0, name.lastIndexOf('?'))
+            version = name.slice(name.lastIndexOf('?') + 1)
+        } else {
+            packageName =name
+        }
         const data = await getSearchUIResult(packageName, version, ecosystem)
         if (typeof data === 'string') {
             handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)

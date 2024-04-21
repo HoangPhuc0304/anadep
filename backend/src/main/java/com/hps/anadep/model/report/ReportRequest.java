@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ReportRequest {
-    private List<?> data;
+    private Object data;
 }

@@ -36,6 +36,7 @@ public class AppSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/user").authenticated()
                         .requestMatchers("/api/repo", "/api/repo/**").authenticated()
                         .requestMatchers("/api/summary").authenticated()
+                        .requestMatchers("/api/fix/repo/{repoId}/history/{historyId}/").authenticated()
                         .anyRequest().permitAll());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);

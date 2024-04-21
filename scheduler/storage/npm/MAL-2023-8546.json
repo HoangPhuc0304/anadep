@@ -1,0 +1,67 @@
+{
+  "id": "MAL-2023-8546",
+  "summary": "Malicious code in xfinity-web (npm)",
+  "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: ghsa-malware (56b70e09dfa991a04792438328717b5904e3250501889b394aaef6f02bd5890a)\nAny computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.\n",
+  "aliases": [
+    "GHSA-q6wh-v939-j2pj"
+  ],
+  "modified": "2023-11-21T00:42:44.147309Z",
+  "published": "2023-11-20T15:40:06Z",
+  "database_specific": {
+    "malicious-packages-origins": [
+      {
+        "modified_time": "2023-11-20T15:41:43Z",
+        "import_time": "2023-11-21T00:24:54.848979064Z",
+        "id": "GHSA-q6wh-v939-j2pj",
+        "ranges": [
+          {
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ],
+            "type": "SEMVER"
+          }
+        ],
+        "source": "ghsa-malware",
+        "sha256": "56b70e09dfa991a04792438328717b5904e3250501889b394aaef6f02bd5890a"
+      }
+    ]
+  },
+  "references": [
+    {
+      "type": "ADVISORY",
+      "url": "https://github.com/advisories/GHSA-q6wh-v939-j2pj"
+    }
+  ],
+  "affected": [
+    {
+      "package": {
+        "name": "xfinity-web",
+        "ecosystem": "npm",
+        "purl": "pkg:npm/xfinity-web"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            }
+          ]
+        }
+      ],
+      "database_specific": {
+        "cwes": [
+          {
+            "description": "The product contains code that appears to be malicious in nature.",
+            "cweId": "CWE-506",
+            "name": "Embedded Malicious Code"
+          }
+        ],
+        "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/xfinity-web/MAL-2023-8546.json"
+      }
+    }
+  ],
+  "schema_version": "1.6.0"
+}

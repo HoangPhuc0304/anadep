@@ -1,0 +1,67 @@
+{
+  "id": "MAL-2024-949",
+  "summary": "Malicious code in diil-front (npm)",
+  "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: ghsa-malware (a63442371776ec2bb7ec621217d72fc34d237c28b8da4150e0bb243e05ff3dd3)\nAny computer that has this package installed or running should be considered fully compromised. All secrets and keys stored on that computer should be rotated immediately from a different computer. The package should be removed, but as full control of the computer may have been given to an outside entity, there is no guarantee that removing the package will remove all malicious software resulting from installing it.\n",
+  "aliases": [
+    "GHSA-rf46-p543-26jx"
+  ],
+  "modified": "2024-02-01T00:41:54.045009Z",
+  "published": "2024-01-31T05:28:47Z",
+  "database_specific": {
+    "malicious-packages-origins": [
+      {
+        "modified_time": "2024-01-31T05:29:40Z",
+        "import_time": "2024-02-01T00:25:08.236071941Z",
+        "id": "GHSA-rf46-p543-26jx",
+        "ranges": [
+          {
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ],
+            "type": "SEMVER"
+          }
+        ],
+        "source": "ghsa-malware",
+        "sha256": "a63442371776ec2bb7ec621217d72fc34d237c28b8da4150e0bb243e05ff3dd3"
+      }
+    ]
+  },
+  "references": [
+    {
+      "type": "ADVISORY",
+      "url": "https://github.com/advisories/GHSA-rf46-p543-26jx"
+    }
+  ],
+  "affected": [
+    {
+      "package": {
+        "name": "diil-front",
+        "ecosystem": "npm",
+        "purl": "pkg:npm/diil-front"
+      },
+      "ranges": [
+        {
+          "type": "SEMVER",
+          "events": [
+            {
+              "introduced": "0"
+            }
+          ]
+        }
+      ],
+      "database_specific": {
+        "cwes": [
+          {
+            "description": "The product contains code that appears to be malicious in nature.",
+            "cweId": "CWE-506",
+            "name": "Embedded Malicious Code"
+          }
+        ],
+        "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/diil-front/MAL-2024-949.json"
+      }
+    }
+  ],
+  "schema_version": "1.6.0"
+}

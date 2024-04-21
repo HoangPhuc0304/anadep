@@ -1,6 +1,11 @@
 package com.hps.anadep.evaluator.enums;
 
+import com.hps.anadep.exception.NotFoundException;
 import com.hps.anadep.model.enums.Ecosystem;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public enum Severity {
     NONE("None", 0), LOW("Low", 0.1), MEDIUM("Medium", 4.0), HIGH("High", 7.0), CRITICAL("Critical", 9.0);
@@ -27,6 +32,21 @@ public enum Severity {
                 return severity;
             }
         }
-        throw new RuntimeException(String.format("Cannot find [%s] ecosystem", severityStr));
+        throw new NotFoundException(String.format("Cannot find [%s] ecosystem", severityStr));
+    }
+
+    public static Severity getSeverityFromScore(double score) {
+        if (score >= CRITICAL.getMinimum()) {
+            return CRITICAL;
+        } else if (score >= HIGH.getMinimum()) {
+            return HIGH;
+        } else if (score >= MEDIUM.getMinimum()) {
+            return MEDIUM;
+        } else if (score >= LOW.getMinimum()) {
+            return LOW;
+        } else if (score >= NONE.getMinimum()) {
+            return NONE;
+        }
+        throw new NotFoundException(String.format("Score [%s] is invalid", score));
     }
 }

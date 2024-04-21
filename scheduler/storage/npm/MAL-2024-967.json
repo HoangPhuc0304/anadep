@@ -1,0 +1,46 @@
+{
+  "id": "MAL-2024-967",
+  "summary": "Malicious code in @ssr-frontend/packages-analytics (npm)",
+  "details": "\n---\n_-= Per source details. Do not edit below this line.=-_\n\n## Source: ossf-package-analysis (d4c4dfe3116f10c0d76d351c620549d1fd72895aec5acf96d5f25afa42e572de)\nThe OpenSSF Package Analysis project identified '@ssr-frontend/packages-analytics' @ 62.2.3 (npm) as malicious.\n\nIt is considered malicious because:\n\n- The package communicates with a domain associated with malicious activity.\n",
+  "modified": "2024-02-06T04:57:30Z",
+  "published": "2024-02-06T04:57:30Z",
+  "database_specific": {
+    "malicious-packages-origins": [
+      {
+        "modified_time": "2024-02-06T04:57:30Z",
+        "import_time": "2024-02-06T05:04:22.131586184Z",
+        "versions": [
+          "62.2.3"
+        ],
+        "source": "ossf-package-analysis",
+        "sha256": "d4c4dfe3116f10c0d76d351c620549d1fd72895aec5acf96d5f25afa42e572de"
+      }
+    ]
+  },
+  "affected": [
+    {
+      "package": {
+        "name": "@ssr-frontend/packages-analytics",
+        "ecosystem": "npm",
+        "purl": "pkg:npm/%40ssr-frontend/packages-analytics"
+      },
+      "versions": [
+        "62.2.3"
+      ],
+      "database_specific": {
+        "source": "https://github.com/ossf/malicious-packages/blob/main/osv/malicious/npm/@ssr-frontend/packages-analytics/MAL-2024-967.json"
+      }
+    }
+  ],
+  "schema_version": "1.6.0",
+  "credits": [
+    {
+      "name": "OpenSSF: Package Analysis",
+      "contact": [
+        "https://github.com/ossf/package-analysis",
+        "https://openssf.slack.com/channels/package_analysis"
+      ],
+      "type": "FINDER"
+    }
+  ]
+}

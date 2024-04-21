@@ -10,19 +10,21 @@ import lombok.NoArgsConstructor;
 public class LibraryFix {
     private String name;
     private String currentVersion;
-    private String ecosystem;
     private String fixedVersion;
+    private String ecosystem;
+    private String severity;
 
     @JsonSetter("ecosystem")
     public void setEcosystem(String ecosystem) {
         this.ecosystem = Ecosystem.getEcosystem(ecosystem).getOsvName();
     }
 
-    public LibraryFix(Library library, String fixedVersion) {
+    public LibraryFix(Library library, String fixedVersion, String severity) {
         this.name = library.getName();
         this.currentVersion = library.getVersion();
         this.ecosystem = library.getEcosystem();
         this.fixedVersion = fixedVersion;
+        this.severity = severity;
     }
 
 //    @JsonIgnore

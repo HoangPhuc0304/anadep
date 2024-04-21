@@ -1,6 +1,5 @@
 package com.hps.anadep.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hps.anadep.model.Library;
 import com.hps.anadep.model.report.ReportRequest;
 import com.hps.anadep.model.osv.Severity;
@@ -9,14 +8,14 @@ import com.hps.anadep.model.response.AnalysisResult;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.response.SummaryFix;
 import com.hps.anadep.model.ui.AnalysisUIResult;
+import com.hps.anadep.security.AppUser;
 import com.hps.anadep.service.AppService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RestController
 public class AppController {
@@ -101,15 +100,31 @@ public class AppController {
 
     @PostMapping("/api/auto-fix")
     @ResponseStatus(HttpStatus.OK)
-    public FixResult autoFix(@RequestBody AnalysisResult analysisResult) {
-        return appService.autoFix(analysisResult);
+    public FixResult autoFix(@RequestBody AnalysisUIResult analysisUIResult) {
+        return appService.autoFix(analysisUIResult);
     }
 
-    @PostMapping("/api/apply-fix")
+    @PostMapping("/api/fix/repo/{repoId}/history/{historyId}")
     @ResponseStatus(HttpStatus.OK)
-    public SummaryFix applyFix(@RequestParam("fixResult") String fixResultStr, @RequestParam("file") MultipartFile file) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        FixResult fixResult = objectMapper.readValue(fixResultStr, FixResult.class);
-        return appService.applyFix(fixResult, file);
+    public SummaryFix applyFix(@PathVariable("repoId") String repoId,
+                               @PathVariable("historyId") String historyId,
+                               @AuthenticationPrincipal AppUser appUser) throws Exception {
+        return appService.applyFix(repoId, historyId, appUser);
+    }
+
+    @PostMapping("/api/security-advisories/repo/{repoId}/history/{historyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void advisory(@PathVariable("repoId") String repoId,
+                         @PathVariable("historyId") String historyId,
+                         @AuthenticationPrincipal AppUser appUser) {
+        appService.advisory(repoId, historyId, appUser);
+    }
+
+    @PostMapping("/api/security-advisories/v2/repo/{repoId}/history/{historyId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void advisoryV2(@PathVariable("repoId") String repoId,
+                           @PathVariable("historyId") String historyId,
+                           @AuthenticationPrincipal AppUser appUser) {
+        appService.advisoryV2(repoId, historyId, appUser);
     }
 }
