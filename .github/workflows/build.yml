@@ -34,16 +34,13 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven
-        run: mvn clean install -B --file backend/pom.xml
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-  
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -57,6 +54,9 @@ jobs:
           echo "anadep_backend_version=$anadep_backend_version" >> $GITHUB_OUTPUT
           echo "anadep_frontend_version=$anadep_frontend_version" >> $GITHUB_OUTPUT
           echo "anadep_scheduler_version=$anadep_scheduler_version" >> $GITHUB_OUTPUT
+
+      - name: Build anadep-backend artifact with Maven
+        run: mvn clean install -B --file backend/pom.xml
 
       - name: Build, tag, and push anadep-backend image to Amazon ECR
         id: build-anadep-backend
@@ -77,6 +77,9 @@ jobs:
           docker build -f frontend/Dockerfile -t $ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG ./frontend/
           docker push $ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build anadep-scheduler artifact with Maven
+        run: mvn clean install -B --file scheduler/pom.xml
 
       - name: Build, tag, and push anadep-scheduler image to Amazon ECR
         id: build-anadep-scheduler
