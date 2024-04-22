@@ -23,7 +23,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && apt-get install
 WORKDIR /app
 COPY target/*.jar app.jar
 COPY script ./script
-COPY storage ./storage
 COPY .mvn ./.mvn
 COPY mvnw mvnw.cmd logo.png ./
 ENTRYPOINT ["java","-jar","app.jar"]
