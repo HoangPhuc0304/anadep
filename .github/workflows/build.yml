@@ -10,7 +10,9 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: anadep-backend
+  ANADEP_BACKEND_ECR_REPOSITORY: anadep-backend
+  ANADEP_FRONTEND_ECR_REPOSITORY: anadep-frontend
+  ANADEP_SCHEDULER_ECR_REPOSITORY: anadep-scheduler
 
 permissions:
   contents: read
@@ -45,13 +47,43 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-  
+
+      - name: Get Docker Tag
+        id: docker-tag
+        run: |
+          anadep_backend_version=$(grep "LABEL version=" backend/Dockerfile | head | sed 's/LABEL version=//g' | tr -d '\t')
+          anadep_frontend_version=$(grep "LABEL version=" frontend/Dockerfile | head | sed 's/LABEL version=//g' | tr -d '\t')
+          anadep_scheduler_version=$(grep "LABEL version=" scheduler/Dockerfile | head | sed 's/LABEL version=//g' | tr -d '\t')
+          echo "anadep_backend_version=$anadep_backend_version" >> $GITHUB_OUTPUT
+          echo "anadep_frontend_version=$anadep_frontend_version" >> $GITHUB_OUTPUT
+          echo "anadep_scheduler_version=$anadep_scheduler_version" >> $GITHUB_OUTPUT
+
       - name: Build, tag, and push anadep-backend image to Amazon ECR
         id: build-anadep-backend
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.anadep_backend_version }}
         run: |
-          docker build -f backend/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend/
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build -f backend/Dockerfile -t $ECR_REGISTRY/$ANADEP_BACKEND_ECR_REPOSITORY:$IMAGE_TAG ./backend/
+          docker push $ECR_REGISTRY/$ANADEP_BACKEND_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ANADEP_BACKEND_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push anadep-frontend image to Amazon ECR
+        id: build-anadep-frontend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.anadep_frontend_version }}
+        run: |
+          docker build -f frontend/Dockerfile -t $ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG ./frontend/
+          docker push $ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push anadep-scheduler image to Amazon ECR
+        id: build-anadep-scheduler
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.anadep_scheduler_version }}
+        run: |
+          docker build -f scheduler/Dockerfile -t $ECR_REGISTRY/$ANADEP_SCHEDULER_ECR_REPOSITORY:$IMAGE_TAG ./scheduler/
+          docker push $ECR_REGISTRY/$ANADEP_SCHEDULER_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ANADEP_SCHEDULER_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT

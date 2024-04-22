@@ -19,6 +19,8 @@ RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.
 #Install NodeJs 21 & NPM
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && apt-get install -y nodejs
 
+LABEL version=1.0.0
+
 #Setup Workplace
 WORKDIR /app
 COPY target/*.jar app.jar
