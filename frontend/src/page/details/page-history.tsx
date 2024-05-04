@@ -92,7 +92,7 @@ export function HistoryDetails() {
     const [history, setHistory] = React.useState<History>()
     const { repoId, id } = useParams()
     const [searchParams, setSearchParams] = useSearchParams()
-    const fixAvailable = searchParams.get('fixAvailable');
+    const fixAvailable = searchParams.get('fixAvailable')
 
     const user: User = useSelector((state: RootState) => state.user.currentUser)
 
@@ -293,7 +293,11 @@ export function HistoryDetails() {
                         </div>
                     </Tabs>
                     {history?.type.toLocaleLowerCase() === 'vulns' ? (
-                        <HistoryVulnsPage repo={repo} history={history} fixAvailable={fixAvailable}/>
+                        <HistoryVulnsPage
+                            repo={repo}
+                            history={history}
+                            fixAvailable={fixAvailable}
+                        />
                     ) : (
                         <HistorySbomPage repo={repo} history={history} />
                     )}

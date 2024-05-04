@@ -64,7 +64,7 @@ export default function SearchingPage({
             packageName = name.slice(0, name.lastIndexOf('?'))
             version = name.slice(name.lastIndexOf('?') + 1)
         } else {
-            packageName =name
+            packageName = name
         }
         const data = await getSearchUIResult(packageName, version, ecosystem)
         if (typeof data === 'string') {

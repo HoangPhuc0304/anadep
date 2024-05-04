@@ -15,6 +15,7 @@ public abstract class HistoryMapper {
 
     @Mapping(target = "scanningResult", expression = "java(getScanningResult(history))")
     @Mapping(target = "repoId", source = "history.repo.id")
+    @Mapping(target = "userId", source = "history.user.id")
     @Mapping(target = "vulnerabilityResult", expression = "java(getVulnerabilityResult(history))")
     public abstract HistoryDto mapToDto(History history);
 

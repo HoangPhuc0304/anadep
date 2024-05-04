@@ -204,7 +204,7 @@ export function SbomScan() {
         let repo = repos.find((r) => r.fullName === data.name)
         if (repo && user.githubToken) {
             const dataRepo = await saveRepo(
-                { ...repo, userId: user.id },
+                { ...repo, userIds: user.id ? [user.id] : [] },
                 user.githubToken
             )
             if (typeof dataRepo === 'string') {

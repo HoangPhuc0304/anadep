@@ -77,6 +77,18 @@ public class GithubClient {
                 .retrieve().bodyToMono(String.class).block();
     }
 
+    public String getRefreshToken(String refreshToken) {
+        return webClientBuilder.build().post()
+                .uri(authUrl, builder -> builder.path("/login/oauth/access_token")
+                        .queryParam("client_id", clientId)
+                        .queryParam("client_secret", clientSecret)
+                        .queryParam("grant_type", "refresh_token")
+                        .queryParam("refresh_token", refreshToken)
+                        .build()
+                )
+                .retrieve().bodyToMono(String.class).block();
+    }
+
     public Branch getBranch(String fullName, String defaultBranch, String accessToken) {
         return webClientBuilder.build().get()
                 .uri(url, builder -> builder.path(GET_BRANCH_URL_FORMAT.formatted(fullName, defaultBranch)).build())
@@ -159,4 +171,5 @@ public class GithubClient {
                 .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_FORMAT.formatted(accessToken))
                 .retrieve().bodyToMono(SecurityAdvisoryResponse[].class).block();
     }
+
 }

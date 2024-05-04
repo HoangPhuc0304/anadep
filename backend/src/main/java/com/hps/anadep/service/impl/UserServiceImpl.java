@@ -24,10 +24,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,40 +57,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public RepoDto save(RepoDto repoDto, AppUser appUser) {
-        validateUserId(repoDto.getUserId(), appUser);
-        UUID userId = repoDto.getUserId();
+        //UserIds should be set of 1 element
+        validateUserId(repoDto.getUserIds(), appUser);
+        UUID userId = repoDto.getUserIds().stream().findFirst().get();
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", userId)));
 
-        Repo repo = repoRepository.findByGithubRepoIdAndUser(repoDto.getGithubRepoId(), user).orElse(null);
+        Repo repo = repoRepository.findByGithubRepoId(repoDto.getGithubRepoId()).orElse(null);
         if (repo == null) {
             repo = new Repo();
             BeanUtils.copyProperties(repoDto, repo, "dependencies", "user");
         }
 
-        repo.setUser(user);
+        Set<User> users = repo.getUsers() == null ? new HashSet<>() : repo.getUsers();
+        users.removeIf(u -> u.getId().equals(user.getId()));
+        users.add(user);
+        repo.setUsers(users);
         return repoMapper.mapToDto(repoRepository.save(repo));
     }
 
     @Override
-    public void update(AuthTokenDto authTokenDto) {
-        User user = userRepository.findById(authTokenDto.getUserId()).orElseThrow(
-                () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", authTokenDto.getUserId())));
-        AuthToken authToken = authTokenRepository.findByUser(user).orElse(null);
-        if (authToken == null) {
-            authToken = new AuthToken();
-            authToken.setUser(user);
-        }
-        authToken.setGithubToken(authTokenDto.getGithubToken());
-        authTokenRepository.save(authToken);
-    }
-
-    @Override
     public void update(String repoId, ScanningResult scanningResult, AppUser appUser) throws JsonProcessingException {
+        User user = userRepository.findById(appUser.getId()).orElseThrow(
+                () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", appUser.getId())));
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
 
         ObjectMapper objectMapper = new ObjectMapper();
         History history = historyRepository.save(
@@ -99,15 +92,18 @@ public class UserServiceImpl implements UserService {
                         .scanningResult(objectMapper.writeValueAsString(scanningResult))
                         .type(ReportType.SBOM.name())
                         .createdAt(new Date())
-                        .repo(repo).build());
+                        .repo(repo)
+                        .user(user).build());
         historyRepository.save(history);
     }
 
     @Override
     public void update(String repoId, AnalysisUIResult analysisUIResult, AppUser appUser) throws JsonProcessingException {
+        User user = userRepository.findById(appUser.getId()).orElseThrow(
+                () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", appUser.getId())));
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
 
         ObjectMapper objectMapper = new ObjectMapper();
         History history = historyRepository.save(
@@ -115,26 +111,32 @@ public class UserServiceImpl implements UserService {
                         .vulnerabilityResult(objectMapper.writeValueAsString(analysisUIResult))
                         .type(ReportType.VULNS.name())
                         .createdAt(new Date())
-                        .repo(repo).build());
+                        .repo(repo)
+                        .user(user).build());
         historyRepository.save(history);
     }
 
     @Override
     @Transactional
     public void delete(String repoId, AppUser appUser) {
+        User user = userRepository.findById(appUser.getId()).orElseThrow(
+                () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", appUser.getId())));
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
 
-        historyRepository.deleteAllByRepo(repo);
-        repoRepository.deleteById(UUID.fromString(repoId));
+        historyRepository.deleteAllByRepoAndUser(repo, user);
+        Set<User> users = repo.getUsers();
+        users.removeIf(u -> u.getId().equals(appUser.getId()));
+        repo.setUsers(users);
+        repoRepository.save(repo);
     }
 
     @Override
     public List<RepoDto> findAll(AppUser appUser) {
         User user = userRepository.findById(appUser.getId()).orElseThrow(
                 () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", appUser.getId())));
-        return repoRepository.findAllByUser(user).stream().map(
+        return user.getRepos().stream().map(
                 repo -> repoMapper.mapToDto(repo)).collect(Collectors.toList());
     }
 
@@ -142,7 +144,7 @@ public class UserServiceImpl implements UserService {
     public RepoDto findRepoById(String repoId, AppUser appUser) {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
         return repoMapper.mapToDto(repo);
     }
 
@@ -156,7 +158,7 @@ public class UserServiceImpl implements UserService {
     public List<HistoryDto> findAllHistories(String repoId, String type, AppUser appUser) {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
         return historyRepository.findAllOrderByCreatedAtDesc(UUID.fromString(repoId), type).stream().map(
                 history -> historyMapper.mapToDto(history)
         ).collect(Collectors.toList());
@@ -166,7 +168,7 @@ public class UserServiceImpl implements UserService {
     public HistoryDto findHistoryById(String repoId, String historyId, AppUser appUser) {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
         History history = historyRepository.findByIdAndRepo(UUID.fromString(historyId), repo).orElseThrow(
                 () -> new RuntimeException(String.format("The history with id [%s] doesn't exist", historyId)));
         return historyMapper.mapToDto(history);
@@ -177,14 +179,14 @@ public class UserServiceImpl implements UserService {
     public void deleteHistoryById(String repoId, String historyId, AppUser appUser) {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
         History history = historyRepository.findByIdAndRepo(UUID.fromString(historyId), repo).orElseThrow(
                 () -> new RuntimeException(String.format("The history with id [%s] doesn't exist", historyId)));
         historyRepository.delete(history);
     }
 
-    private void validateUserId(UUID id, AppUser appUser) {
-        if (!appUser.getId().equals(id)) {
+    private void validateUserId(Set<UUID> ids, AppUser appUser) {
+        if (CollectionUtils.isEmpty(ids) || !ids.contains(appUser.getId())) {
             throw new RuntimeException("Authorize failed");
         }
     }

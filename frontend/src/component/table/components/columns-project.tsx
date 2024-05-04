@@ -199,19 +199,6 @@ export const columns: ColumnDef<Repository>[] = [
         ),
     },
     {
-        accessorKey: 'updatedBy',
-        accessorFn: (row) => row.updatedBy,
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Updated By" />
-        ),
-        cell: ({ row }) => (
-            <div className="max-w-[200px] line-clamp-2 font-medium">
-                {row.original.updatedBy}
-            </div>
-        ),
-        enableSorting: false,
-    },
-    {
         id: 'actions',
         cell: ({ row }) => <DataTableRowProjectActions row={row} />,
     },

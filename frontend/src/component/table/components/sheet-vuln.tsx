@@ -62,9 +62,7 @@ const VulnerabilityDetailSheetContent: React.FC<{ lib: LibraryScanUI }> = ({
                     <div className="grid grid-cols-4 gap-4">
                         <span className="items-start font-bold">Details</span>
                         <span className="col-span-3">
-                            <ReactMarkdown>
-                                {lib.vuln.details}
-                            </ReactMarkdown>
+                            <ReactMarkdown>{lib.vuln.details}</ReactMarkdown>
                         </span>
                     </div>
                     <div className="grid grid-cols-4 items-start gap-4">

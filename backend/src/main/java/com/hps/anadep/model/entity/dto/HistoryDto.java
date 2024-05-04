@@ -24,5 +24,9 @@ public class HistoryDto {
 
     private String type;
 
+    private String path;
+
     private UUID repoId;
+
+    private UUID userId;
 }

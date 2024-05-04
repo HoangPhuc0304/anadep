@@ -15,15 +15,34 @@ import { Separator } from '../ui/separator'
 import { Link } from 'react-router-dom'
 import { Button } from '../ui/button'
 import { GitPullRequestArrow, ShieldAlert } from 'lucide-react'
-import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../ui/table'
-import { createPullRequest, createSecurityAdvisory, getAutoFix } from '../../api/apiCall'
-import { DEFAULT_ERROR_MESSAGE, ERROR_LABEL, PULL_REQUEST_SUCCESS_MESSAGE, SECURITY_ADVISORY_SUCCESS_MESSAGE, SUCCESS_LABEL } from '../../common/common'
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '../ui/table'
+import {
+    createPullRequest,
+    createSecurityAdvisory,
+    getAutoFix,
+} from '../../api/apiCall'
+import {
+    DEFAULT_ERROR_MESSAGE,
+    ERROR_LABEL,
+    PULL_REQUEST_SUCCESS_MESSAGE,
+    SECURITY_ADVISORY_SUCCESS_MESSAGE,
+    SUCCESS_LABEL,
+} from '../../common/common'
 import { Skeleton } from '../ui/skeleton'
 
 export default function HistoryVulnsPage({
     repo,
     history,
-    fixAvailable
+    fixAvailable,
 }: {
     repo: Repository | undefined
     history: History | undefined
@@ -51,7 +70,11 @@ export default function HistoryVulnsPage({
         )
 
         if (repoData?.id && historyData?.id && user.githubToken) {
-            const data = await createPullRequest(repoData.id, historyData.id, user.githubToken);
+            const data = await createPullRequest(
+                repoData.id,
+                historyData.id,
+                user.githubToken
+            )
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
             } else {
@@ -67,18 +90,25 @@ export default function HistoryVulnsPage({
         )
 
         if (repoData?.id && historyData?.id && user.githubToken) {
-            const data = await createSecurityAdvisory(repoData.id, historyData.id, user.githubToken);
+            const data = await createSecurityAdvisory(
+                repoData.id,
+                historyData.id,
+                user.githubToken
+            )
             if (typeof data === 'string' || data === false) {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
             } else {
-                handlingToastAction(SUCCESS_LABEL, SECURITY_ADVISORY_SUCCESS_MESSAGE)
+                handlingToastAction(
+                    SUCCESS_LABEL,
+                    SECURITY_ADVISORY_SUCCESS_MESSAGE
+                )
             }
         }
     }
 
     const fetchData = async () => {
         if (historyData?.vulnerabilityResult) {
-            const data = await getAutoFix(historyData.vulnerabilityResult);
+            const data = await getAutoFix(historyData.vulnerabilityResult)
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
             } else {
@@ -160,16 +190,16 @@ export default function HistoryVulnsPage({
                                         <div className="items-start font-bold">
                                             Updated By:
                                         </div>
-                                        <div>{repoData?.updatedBy}</div>
+                                        <div>{historyData?.updatedBy}</div>
                                     </div>
                                     <div className="mb-2">
                                         <div className="items-start font-bold">
                                             Created At:
                                         </div>
                                         <div>
-                                            {repoData?.createdAt &&
+                                            {historyData?.createdAt &&
                                                 new Date(
-                                                    repoData?.createdAt
+                                                    historyData?.createdAt
                                                 ).toLocaleString()}
                                         </div>
                                     </div>
@@ -223,6 +253,12 @@ export default function HistoryVulnsPage({
                                                 ? 'True'
                                                 : 'False'}
                                         </div>
+                                    </div>
+                                    <div className="mb-2">
+                                        <div className="items-start font-bold">
+                                            Path:
+                                        </div>
+                                        <div>{history?.path}</div>
                                     </div>
                                     <div className="mb-2">
                                         <div className="items-start font-bold">
@@ -294,15 +330,16 @@ export default function HistoryVulnsPage({
                                         <div>
                                             <Badge
                                                 style={{
-                                                    backgroundColor: `${statuses.find(
-                                                        (s) =>
-                                                            s.value ===
-                                                            repoData
-                                                                ?.vulnerabilitySummary
-                                                                ?.status
-                                                    )?.color ||
+                                                    backgroundColor: `${
+                                                        statuses.find(
+                                                            (s) =>
+                                                                s.value ===
+                                                                repoData
+                                                                    ?.vulnerabilitySummary
+                                                                    ?.status
+                                                        )?.color ||
                                                         'hsl(var(--foreground))'
-                                                        }`,
+                                                    }`,
                                                 }}
                                             >
                                                 {
@@ -313,17 +350,27 @@ export default function HistoryVulnsPage({
                                             </Badge>
                                         </div>
                                     </div>
-                                    {fixAvailable && <Button className='text-center my-4' onClick={handleCreateSecurityAdvisory}>
-                                        <ShieldAlert className="mr-2 w-5 h-5" />
-                                        Create Security Advisory
-                                    </Button>}
+                                    {fixAvailable && (
+                                        <Button
+                                            className="text-center my-4"
+                                            onClick={
+                                                handleCreateSecurityAdvisory
+                                            }
+                                        >
+                                            <ShieldAlert className="mr-2 w-5 h-5" />
+                                            Create Security Advisory
+                                        </Button>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
 
-                        {fixAvailable
-                            && <>
-                                <Button className='text-center my-4' onClick={handleCreatePullRequest}>
+                        {fixAvailable && (
+                            <>
+                                <Button
+                                    className="text-center my-4"
+                                    onClick={handleCreatePullRequest}
+                                >
                                     <GitPullRequestArrow className="mr-2 w-5 h-5" />
                                     Create Pull Request
                                 </Button>
@@ -331,59 +378,110 @@ export default function HistoryVulnsPage({
                                 <div className="">
                                     <Card className="">
                                         <CardHeader>
-                                            <CardTitle>Fix vulnerabilities</CardTitle>
+                                            <CardTitle>
+                                                Fix vulnerabilities
+                                            </CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             <Table>
-                                                <TableCaption>A list of fix vulnerabilities.</TableCaption>
+                                                <TableCaption>
+                                                    A list of fix
+                                                    vulnerabilities.
+                                                </TableCaption>
                                                 <TableHeader>
                                                     <TableRow>
                                                         <TableHead></TableHead>
-                                                        <TableHead>Name</TableHead>
-                                                        <TableHead>Current Version</TableHead>
-                                                        <TableHead>Fix Version</TableHead>
+                                                        <TableHead>
+                                                            Name
+                                                        </TableHead>
+                                                        <TableHead>
+                                                            Current Version
+                                                        </TableHead>
+                                                        <TableHead>
+                                                            Fix Version
+                                                        </TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
                                                     {loading
-                                                        ? Array(10).fill({}).map((val, index) => <TableRow key={index}>
-                                                            <TableCell>
-                                                                <Skeleton className="h-[24px] w-full" />
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Skeleton className="h-[24px] w-full" />
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Skeleton className="h-[24px] w-full" />
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Skeleton className="h-[24px] w-full" />
-                                                            </TableCell>
-                                                        </TableRow>)
-                                                        : fixResult?.libs.map((lib, index) => (
-                                                            <TableRow key={index}>
-                                                                <TableCell>
-                                                                    <Badge
-                                                                        style={{
-                                                                            backgroundColor: severities.find(s => s.value === lib.severity)?.color,
-                                                                        }}
-                                                                    >
-                                                                        {lib.severity}
-                                                                    </Badge>
-                                                                </TableCell>
-                                                                <TableCell>{lib.name}</TableCell>
-                                                                <TableCell>{lib.currentVersion}</TableCell>
-                                                                <TableCell>{lib.fixedVersion}</TableCell>
-                                                            </TableRow>
-                                                        ))
-                                                    }
+                                                        ? Array(10)
+                                                              .fill({})
+                                                              .map(
+                                                                  (
+                                                                      val,
+                                                                      index
+                                                                  ) => (
+                                                                      <TableRow
+                                                                          key={
+                                                                              index
+                                                                          }
+                                                                      >
+                                                                          <TableCell>
+                                                                              <Skeleton className="h-[24px] w-full" />
+                                                                          </TableCell>
+                                                                          <TableCell>
+                                                                              <Skeleton className="h-[24px] w-full" />
+                                                                          </TableCell>
+                                                                          <TableCell>
+                                                                              <Skeleton className="h-[24px] w-full" />
+                                                                          </TableCell>
+                                                                          <TableCell>
+                                                                              <Skeleton className="h-[24px] w-full" />
+                                                                          </TableCell>
+                                                                      </TableRow>
+                                                                  )
+                                                              )
+                                                        : fixResult?.libs.map(
+                                                              (lib, index) => (
+                                                                  <TableRow
+                                                                      key={
+                                                                          index
+                                                                      }
+                                                                  >
+                                                                      <TableCell>
+                                                                          <Badge
+                                                                              style={{
+                                                                                  backgroundColor:
+                                                                                      severities.find(
+                                                                                          (
+                                                                                              s
+                                                                                          ) =>
+                                                                                              s.value ===
+                                                                                              lib.severity
+                                                                                      )
+                                                                                          ?.color,
+                                                                              }}
+                                                                          >
+                                                                              {
+                                                                                  lib.severity
+                                                                              }
+                                                                          </Badge>
+                                                                      </TableCell>
+                                                                      <TableCell>
+                                                                          {
+                                                                              lib.name
+                                                                          }
+                                                                      </TableCell>
+                                                                      <TableCell>
+                                                                          {
+                                                                              lib.currentVersion
+                                                                          }
+                                                                      </TableCell>
+                                                                      <TableCell>
+                                                                          {
+                                                                              lib.fixedVersion
+                                                                          }
+                                                                      </TableCell>
+                                                                  </TableRow>
+                                                              )
+                                                          )}
                                                 </TableBody>
                                             </Table>
                                         </CardContent>
                                     </Card>
                                 </div>
                             </>
-                        }
+                        )}
 
                         <ScrollBar orientation="horizontal" />
                     </ScrollArea>

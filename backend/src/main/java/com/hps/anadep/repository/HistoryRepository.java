@@ -2,6 +2,7 @@ package com.hps.anadep.repository;
 
 import com.hps.anadep.model.entity.History;
 import com.hps.anadep.model.entity.Repo;
+import com.hps.anadep.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,5 +23,5 @@ public interface HistoryRepository extends JpaRepository<History, UUID> {
 
     Optional<History> findByIdAndRepo(UUID id, Repo repo);
 
-    void deleteAllByRepo(Repo repo);
+    void deleteAllByRepoAndUser(Repo repo, User user);
 }

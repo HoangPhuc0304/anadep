@@ -104,16 +104,16 @@ export default function HistorySbomPage({
                                         <div className="items-start font-bold">
                                             Updated By:
                                         </div>
-                                        <div>{repoData?.updatedBy}</div>
+                                        <div>{historyData?.updatedBy}</div>
                                     </div>
                                     <div className="mb-2">
                                         <div className="items-start font-bold">
                                             Created At:
                                         </div>
                                         <div>
-                                            {repoData?.createdAt &&
+                                            {historyData?.createdAt &&
                                                 new Date(
-                                                    repoData?.createdAt
+                                                    historyData?.createdAt
                                                 ).toLocaleString()}
                                         </div>
                                     </div>
@@ -153,6 +153,12 @@ export default function HistorySbomPage({
                                                 ? 'True'
                                                 : 'False'}
                                         </div>
+                                    </div>
+                                    <div className="mb-2">
+                                        <div className="items-start font-bold">
+                                            Path:
+                                        </div>
+                                        <div>{history?.path}</div>
                                     </div>
                                     <div className="mb-2">
                                         <div className="items-start font-bold">

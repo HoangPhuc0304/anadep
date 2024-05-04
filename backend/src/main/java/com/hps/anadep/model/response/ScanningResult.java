@@ -18,6 +18,7 @@ public class ScanningResult {
     Set<Dependency> dependencies;
     private String projectName;
     private String ecosystem;
+    private String path;
     private int libraryCount;
     private boolean includeTransitive;
     private long responseTime;
@@ -27,6 +28,7 @@ public class ScanningResult {
         this.dependencies = scanningResult.getDependencies();
         this.projectName = scanningResult.getProjectName();
         this.ecosystem = scanningResult.getEcosystem();
+        this.path = scanningResult.getPath();
         this.libraryCount = scanningResult.getLibraryCount();
         this.includeTransitive = scanningResult.isIncludeTransitive();
         this.responseTime = responseTime;

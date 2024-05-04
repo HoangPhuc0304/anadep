@@ -1,4 +1,3 @@
-
 spring:
   application:
     name: anadep-scheduler
@@ -13,3 +12,7 @@ spring:
         endpoint:
 server:
   port: 8081
+
+schedule:
+  cron:
+    expression: 0 0 0 * * *

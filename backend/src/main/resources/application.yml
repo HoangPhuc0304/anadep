@@ -42,3 +42,7 @@ spring:
 github:
   client-id:
   client-secret:
+
+anadep:
+  db:
+    enable: false

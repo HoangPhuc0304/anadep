@@ -11,33 +11,51 @@ import { DEFAULT_ERROR_MESSAGE } from '../common/common'
 import { client, githubClient } from '../config/requestConfig'
 import { wait } from '@testing-library/user-event/dist/utils'
 import { getVulnerabilityStatus } from '../util/util'
-
+import { any } from 'zod'
+import { createTokenAuth } from '@octokit/auth-token'
+import { Octokit } from 'octokit'
 
 export const getAnalysisUIResult = async (file: File) => {
     try {
         const formData = new FormData()
         formData.append('file', file)
-        const response = await client.post(process.env.REACT_APP_ENABLE_ANADEP_DB === 'true' ? '/ui/analyze/v2' : '/ui/analyze', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        })
+        const response = await client.post(
+            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+                ? '/ui/analyze/v2'
+                : '/ui/analyze',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        )
         return response.status === 200 ? response.data : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
     }
 }
 
-export const getAuthAnalysisUIResult = async (file: File, repoId: string, accessToken: string) => {
+export const getAuthAnalysisUIResult = async (
+    file: File,
+    repoId: string,
+    accessToken: string
+) => {
     try {
         const formData = new FormData()
         formData.append('file', file)
-        const response = await client.post(process.env.REACT_APP_ENABLE_ANADEP_DB === 'true' ? `/ui/analyze/v2/repo/${repoId}` : `/ui/analyze/repo/${repoId}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${accessToken}`,
-            },
-        })
+        const response = await client.post(
+            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+                ? `/ui/analyze/v2/repo/${repoId}`
+                : `/ui/analyze/repo/${repoId}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        )
         return response.status === 200 ? response.data : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
@@ -63,7 +81,11 @@ export const downloadFileFormGitHubUrl = async (
 
 export const getVulnerabilityFromId = async (databaseId: string) => {
     try {
-        const response = await client.get(process.env.REACT_APP_ENABLE_ANADEP_DB === 'true' ? `/ui/vulns/${databaseId}/v2` : `/ui/vulns/${databaseId}`)
+        const response = await client.get(
+            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+                ? `/ui/vulns/${databaseId}/v2`
+                : `/ui/vulns/${databaseId}`
+        )
         return response.status === 200 ? response.data : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
@@ -77,7 +99,9 @@ export const getSearchUIResult = async (
 ) => {
     try {
         const response = await client.post(
-            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true' ? '/ui/retrieve/v2' : '/ui/retrieve',
+            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+                ? '/ui/retrieve/v2'
+                : '/ui/retrieve',
             {
                 name,
                 version,
@@ -110,16 +134,24 @@ export const getScanUIResult = async (file: File) => {
     }
 }
 
-export const getAuthScanUIResult = async (file: File, repoId: string, accessToken: string) => {
+export const getAuthScanUIResult = async (
+    file: File,
+    repoId: string,
+    accessToken: string
+) => {
     try {
         const formData = new FormData()
         formData.append('file', file)
-        const response = await client.post(`/ui/scan/repo/${repoId}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${accessToken}`,
-            },
-        })
+        const response = await client.post(
+            `/ui/scan/repo/${repoId}`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        )
         return response.status === 200 ? response.data : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
@@ -199,7 +231,11 @@ export const getAuthUser = async (token: string) => {
     }
 }
 
-export const saveUser = async (user: User, accessToken: string) => {
+export const saveUser = async (
+    user: User,
+    accessToken: string,
+    refreshToken: string
+) => {
     try {
         const response = await client.post(
             '/api/user',
@@ -215,10 +251,11 @@ export const saveUser = async (user: User, accessToken: string) => {
         const data = response.data
 
         const updateResponse = await client.post(
-            '/api/user/token',
+            '/ui/user/token',
             {
                 userId: data.id,
                 githubToken: accessToken,
+                refreshToken: refreshToken,
             },
             {
                 headers: {
@@ -235,14 +272,24 @@ export const saveUser = async (user: User, accessToken: string) => {
     }
 }
 
-export const getUser = async (accessToken: string) => {
+export const getUser = async (userId: string | null, accessToken: string) => {
     try {
-        const response = await client.get('/api/user', {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-            },
-        })
+        let response
+        if (userId) {
+            response = await client.get(`/api/user/${userId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
+        } else {
+            response = await client.get('/api/user', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            })
+        }
 
         return response.status === 200 ? response.data : DEFAULT_ERROR_MESSAGE
     } catch (err) {
@@ -252,35 +299,35 @@ export const getUser = async (accessToken: string) => {
 
 export const getAuthRepos = async (accessToken: string) => {
     try {
-        const response = await githubClient.get('/user/repos', {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-            },
+        const octokit = new Octokit({
+            auth: accessToken,
         })
-        return response.status === 200
-            ? response.data.map(
-                (res: {
-                    id: any
-                    name: any
-                    full_name: any
-                    owner: any
-                    default_branch: any
-                    private: any
-                    language: any
-                    html_url: any
-                }) => ({
-                    githubRepoId: res.id,
-                    name: res.name,
-                    fullName: res.full_name,
-                    owner: res.owner.login,
-                    defaultBranch: res.default_branch,
-                    isPublic: !res.private,
-                    githubUrl: res.html_url,
-                    language: res.language,
-                })
-            )
-            : DEFAULT_ERROR_MESSAGE
+
+        const repos = await octokit.paginate(
+            octokit.rest.repos.listForAuthenticatedUser
+        )
+
+        return repos.map(
+            (res: {
+                id: any
+                name: any
+                full_name: any
+                owner: any
+                default_branch: any
+                private: any
+                language: any
+                html_url: any
+            }) => ({
+                githubRepoId: res.id,
+                name: res.name,
+                fullName: res.full_name,
+                owner: res.owner.login,
+                defaultBranch: res.default_branch,
+                isPublic: !res.private,
+                githubUrl: res.html_url,
+                language: res.language,
+            })
+        )
     } catch (err) {
         return (err as Error).message
     }
@@ -295,20 +342,18 @@ export const getRepoById = async (repoId: string, accessToken: string) => {
             },
         })
 
-        const user = await getUser(accessToken)
         const vulnerabilitySummary = await getVulnerabilitySummary(
             response.data.vulnerabilityResult?.libs
         )
 
         return response.status === 200
             ? {
-                ...response.data,
-                updatedBy: user.name || user.login,
-                vulnerabilitySummary: {
-                    ...vulnerabilitySummary,
-                    status: getVulnerabilityStatus(vulnerabilitySummary),
-                },
-            }
+                  ...response.data,
+                  vulnerabilitySummary: {
+                      ...vulnerabilitySummary,
+                      status: getVulnerabilityStatus(vulnerabilitySummary),
+                  },
+              }
             : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
@@ -395,27 +440,24 @@ export const getRepos = async (accessToken: string) => {
             },
         })
 
-        const user = await getUser(accessToken)
-
         return response.status === 200
             ? await Promise.all(
-                response.data.map(async (res: any) => {
-                    const vulnerabilitySummary =
-                        await getVulnerabilitySummary(
-                            res.vulnerabilityResult?.libs
-                        )
-                    return {
-                        ...res,
-                        updatedBy: user.name || user.login,
-                        vulnerabilitySummary: {
-                            ...vulnerabilitySummary,
-                            status: getVulnerabilityStatus(
-                                vulnerabilitySummary
-                            ),
-                        },
-                    }
-                })
-            )
+                  response.data.map(async (res: any) => {
+                      const vulnerabilitySummary =
+                          await getVulnerabilitySummary(
+                              res.vulnerabilityResult?.libs
+                          )
+                      return {
+                          ...res,
+                          vulnerabilitySummary: {
+                              ...vulnerabilitySummary,
+                              status: getVulnerabilityStatus(
+                                  vulnerabilitySummary
+                              ),
+                          },
+                      }
+                  })
+              )
             : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
@@ -474,37 +516,38 @@ export const getHistories = async (
             }
         )
 
-        const user = await getUser(accessToken)
-
         if (type === 'vulns') {
             return response.status === 200
                 ? await Promise.all(
-                    response.data.map(async (res: any) => {
-                        const vulnerabilitySummary =
-                            await getVulnerabilitySummary(
-                                res.vulnerabilityResult?.libs
-                            )
-                        return {
-                            ...res,
-                            updatedBy: user.name || user.login,
-                            vulnerabilitySummary: {
-                                ...vulnerabilitySummary,
-                                status: getVulnerabilityStatus(
-                                    vulnerabilitySummary
-                                ),
-                            },
-                        }
-                    })
-                )
+                      response.data.map(async (res: any) => {
+                          const vulnerabilitySummary =
+                              await getVulnerabilitySummary(
+                                  res.vulnerabilityResult?.libs
+                              )
+                          return {
+                              ...res,
+                              updatedBy: (
+                                  await getUser(res.userId, accessToken)
+                              ).login,
+                              vulnerabilitySummary: {
+                                  ...vulnerabilitySummary,
+                                  status: getVulnerabilityStatus(
+                                      vulnerabilitySummary
+                                  ),
+                              },
+                          }
+                      })
+                  )
                 : DEFAULT_ERROR_MESSAGE
         } else {
             return response.status === 200
-                ? response.data.map((res: any) => {
-                    return {
-                        ...res,
-                        updatedBy: user.name || user.login,
-                    }
-                })
+                ? response.data.map(async (res: any) => {
+                      return {
+                          ...res,
+                          updatedBy: (await getUser(res.userId, accessToken))
+                              .login,
+                      }
+                  })
                 : DEFAULT_ERROR_MESSAGE
         }
     } catch (err) {
@@ -528,7 +571,13 @@ export const getHistoryById = async (
             }
         )
 
-        return response.status === 200 ? response.data : DEFAULT_ERROR_MESSAGE
+        return response.status === 200
+            ? {
+                  ...response.data,
+                  updatedBy: (await getUser(response.data.userId, accessToken))
+                      .login,
+              }
+            : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
     }
@@ -576,7 +625,11 @@ export const getAutoFix = async (analysisUIResult: AnalysisUIResult) => {
     }
 }
 
-export const createPullRequest = async (repoId: string, historyId: string, accessToken: string) => {
+export const createPullRequest = async (
+    repoId: string,
+    historyId: string,
+    accessToken: string
+) => {
     try {
         const response = await client.post(
             `/api/fix/repo/${repoId}/history/${historyId}`,
@@ -594,10 +647,16 @@ export const createPullRequest = async (repoId: string, historyId: string, acces
     }
 }
 
-export const createSecurityAdvisory = async (repoId: string, historyId: string, accessToken: string) => {
+export const createSecurityAdvisory = async (
+    repoId: string,
+    historyId: string,
+    accessToken: string
+) => {
     try {
         const response = await client.post(
-            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true' ? `/api/security-advisories/v2/repo/${repoId}/history/${historyId}` : `/api/security-advisories/repo/${repoId}/history/${historyId}`,
+            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+                ? `/api/security-advisories/v2/repo/${repoId}/history/${historyId}`
+                : `/api/security-advisories/repo/${repoId}/history/${historyId}`,
             {},
             {
                 headers: {
@@ -607,6 +666,28 @@ export const createSecurityAdvisory = async (repoId: string, historyId: string, 
             }
         )
         return response.status === 200 ? true : false
+    } catch (err) {
+        return (err as Error).message
+    }
+}
+
+export const isInstallGithubApp = async (
+    token: string,
+    githubUserId: number
+) => {
+    try {
+        const octokit = new Octokit({
+            auth: token,
+        })
+
+        const installations = await octokit.paginate(
+            octokit.rest.apps.listInstallationsForAuthenticatedUser
+        )
+        return (
+            Array.from(installations).filter(
+                (i: any) => i.account && i.account.id === githubUserId
+            ).length > 0
+        )
     } catch (err) {
         return (err as Error).message
     }

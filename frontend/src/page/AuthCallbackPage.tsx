@@ -29,8 +29,8 @@ export function AuthCallbackPage() {
         })
     }
 
-    const fetchData = async () => {
-        const tokenResponse = await getAccessToken(code || '')
+    const fetchData = async (code: string) => {
+        const tokenResponse = await getAccessToken(code)
         if (typeof tokenResponse === 'string') {
             handlingToastAction(
                 ERROR_LABEL,
@@ -55,7 +55,8 @@ export function AuthCallbackPage() {
             }
             const savedUser = await saveUser(
                 userRequest,
-                tokenResponse.accessToken
+                tokenResponse.accessToken,
+                tokenResponse.refreshToken
             )
             if (typeof savedUser === 'string') {
                 handlingToastAction(
@@ -73,7 +74,7 @@ export function AuthCallbackPage() {
     }
 
     React.useEffect(() => {
-        fetchData()
+        code && fetchData(code)
     }, [code])
 
     return <div>Authorizing ...</div>

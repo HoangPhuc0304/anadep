@@ -12,11 +12,8 @@ import com.hps.anadep.model.entity.AuthToken;
 import com.hps.anadep.model.entity.History;
 import com.hps.anadep.model.entity.Repo;
 import com.hps.anadep.model.entity.User;
+import com.hps.anadep.model.entity.dto.AuthTokenDto;
 import com.hps.anadep.model.enums.ReportType;
-import com.hps.anadep.model.github.SecurityAdvisoryRequest;
-import com.hps.anadep.model.github.SecurityAdvisoryVulnerability;
-import com.hps.anadep.model.osv.Affected;
-import com.hps.anadep.model.osv.Event;
 import com.hps.anadep.model.osv.Vulnerability;
 import com.hps.anadep.model.response.AnalysisResult;
 import com.hps.anadep.model.response.LibraryScan;
@@ -36,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -64,6 +60,9 @@ public class UiServiceImpl implements UiService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private static final String V1 = "V1";
+    private static final String V2 = "V2";
+
     @Override
     public AnalysisUIResult retrieve(Library library) {
         AnalysisResult analysisResult = appService.retrieve(library);
@@ -84,9 +83,11 @@ public class UiServiceImpl implements UiService {
     @Override
     @Transactional
     public ScanningResult scan(String repoId, MultipartFile file, boolean includeTransitive, AppUser appUser) throws Exception {
+        User user = userRepository.findById(appUser.getId()).orElseThrow(
+                () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", appUser.getId())));
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new NotFoundException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
 
         ScanningResult scanningResult = appService.scan(file, includeTransitive);
         History history = historyRepository.save(
@@ -94,7 +95,8 @@ public class UiServiceImpl implements UiService {
                         .scanningResult(objectMapper.writeValueAsString(scanningResult))
                         .type(ReportType.SBOM.name())
                         .createdAt(new Date())
-                        .repo(repo).build());
+                        .repo(repo)
+                        .user(user).build());
         historyRepository.save(history);
         return scanningResult;
     }
@@ -110,18 +112,8 @@ public class UiServiceImpl implements UiService {
     public AnalysisUIResult analyze(String repoId, MultipartFile file, boolean includeSafe, AppUser appUser) throws Exception {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new NotFoundException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
-
-        History history = new History();
-        history.setType(ReportType.VULNS.name());
-        history.setCreatedAt(new Date());
-        history.setRepo(repo);
-
-        AnalysisResult analysisResult = appService.analyze(file, includeSafe, history);
-        AnalysisUIResult analysisUIResult = appService.reformat(analysisResult);
-        history.setVulnerabilityResult(objectMapper.writeValueAsString(analysisUIResult));
-        historyRepository.save(history);
-        return analysisUIResult;
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
+        return getAnalysisUIResult(file, includeSafe, repo, V1, appUser.getId());
     }
 
     @Override
@@ -135,18 +127,8 @@ public class UiServiceImpl implements UiService {
     public AnalysisUIResult analyzeV2(String repoId, MultipartFile file, boolean includeSafe, AppUser appUser) throws Exception {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new NotFoundException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
-
-        History history = new History();
-        history.setType(ReportType.VULNS.name());
-        history.setCreatedAt(new Date());
-        history.setRepo(repo);
-
-        AnalysisResult analysisResult = appService.analyzeV2(file, includeSafe, history);
-        AnalysisUIResult analysisUIResult = appService.reformat(analysisResult);
-        history.setVulnerabilityResult(objectMapper.writeValueAsString(analysisUIResult));
-        historyRepository.save(history);
-        return analysisUIResult;
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
+        return getAnalysisUIResult(file, includeSafe, repo, V2, appUser.getId());
     }
 
     @Override
@@ -187,6 +169,20 @@ public class UiServiceImpl implements UiService {
         return vulnerabilitySummary;
     }
 
+    @Override
+    public void update(AuthTokenDto authTokenDto) {
+        User user = userRepository.findById(authTokenDto.getUserId()).orElseThrow(
+                () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", authTokenDto.getUserId())));
+        AuthToken authToken = authTokenRepository.findByUser(user).orElse(null);
+        if (authToken == null) {
+            authToken = new AuthToken();
+            authToken.setUser(user);
+        }
+        authToken.setGithubToken(authTokenDto.getGithubToken());
+        authToken.setRefreshToken(authTokenDto.getRefreshToken());
+        authTokenRepository.save(authToken);
+    }
+
     private AnalysisUIResult getAnalysisUIResult(AnalysisResult analysisResult) {
         List<LibraryScanUI> libs = new ArrayList<>();
         for (LibraryScan libScan : analysisResult.getLibs()) {
@@ -205,6 +201,29 @@ public class UiServiceImpl implements UiService {
         );
     }
 
+    public AnalysisUIResult getAnalysisUIResult(MultipartFile file, boolean includeSafe, Repo repo, String version, UUID userId) throws Exception {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new RuntimeException(String.format("The user with id [%s] doesn't exist", userId)));
+
+        History history = new History();
+        history.setType(ReportType.VULNS.name());
+        history.setCreatedAt(new Date());
+        history.setRepo(repo);
+        history.setUser(user);
+
+        AnalysisResult analysisResult;
+        if (version.equals(V1)) {
+            analysisResult = appService.analyze(file, includeSafe, history);
+        } else {
+            analysisResult = appService.analyzeV2(file, includeSafe, history);
+        }
+
+        AnalysisUIResult analysisUIResult = appService.reformat(analysisResult);
+        history.setVulnerabilityResult(objectMapper.writeValueAsString(analysisUIResult));
+        historyRepository.save(history);
+        return analysisUIResult;
+    }
+
     private String getRepoFromGithubUrl(String url) {
         String repo = url;
         if (url.endsWith(".git")) {
@@ -214,8 +233,8 @@ public class UiServiceImpl implements UiService {
         return repo.substring(repo.lastIndexOf("/", index - 1) + 1);
     }
 
-    private void validateUserId(UUID id, AppUser appUser) {
-        if (!appUser.getId().equals(id)) {
+    private void validateUserId(Set<UUID> ids, AppUser appUser) {
+        if (CollectionUtils.isEmpty(ids) || !ids.contains(appUser.getId())) {
             throw new RuntimeException("Authorize failed");
         }
     }

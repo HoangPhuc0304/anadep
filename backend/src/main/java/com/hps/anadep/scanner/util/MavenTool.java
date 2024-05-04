@@ -10,6 +10,7 @@ import com.hps.anadep.model.enums.Ecosystem;
 import com.hps.anadep.model.enums.Resolution;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.response.SummaryFix;
+import com.hps.anadep.model.util.Namespace;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.DependencyManagement;
@@ -42,9 +43,9 @@ public class MavenTool implements PackageManagementTool {
     private static final String DEPENDENCY_NAME_FORMAT = "%s:%s";
 
     @Override
-    public ScanningResult getDependencies(boolean includeTransitive, String namespace) throws Exception {
-        String storagePackageDir = String.join("/", SCANNER_DIR, namespace);
-        String storageText = String.join("/", SCANNER_DIR, namespace, STORAGE_JSON_FILE_NAME);
+    public ScanningResult getDependencies(boolean includeTransitive, Namespace namespace) throws Exception {
+        String storagePackageDir = String.join("/", SCANNER_DIR, namespace.getPath());
+        String storageJson = String.join("/", SCANNER_DIR, namespace.getPath(), STORAGE_JSON_FILE_NAME);
         Set<Library> libraries = new HashSet<>();
 
         processing(storagePackageDir, STORAGE_JSON_FILE_NAME);
@@ -59,7 +60,7 @@ public class MavenTool implements PackageManagementTool {
         String packagingType = model.getPackaging();
 
         String id = String.format(MAVEN_FORMAT_ID, groupId, artifactId, packagingType);
-        Depgraph depgraph = objectMapper.readValue(new File(storageText), Depgraph.class);
+        Depgraph depgraph = objectMapper.readValue(new File(storageJson), Depgraph.class);
         refactor(depgraph, id);
         List<Artifact> artifacts = depgraph.getArtifacts();
 
@@ -83,6 +84,7 @@ public class MavenTool implements PackageManagementTool {
                 .dependencies(Set.copyOf(depgraph.getDependencies()))
                 .projectName(depgraph.getGraphName())
                 .ecosystem(Ecosystem.MAVEN.getOsvName())
+                .path(namespace.getManifestFilePath())
                 .libraryCount(libraries.size())
                 .includeTransitive(includeTransitive)
                 .build();

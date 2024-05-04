@@ -9,6 +9,7 @@ import com.hps.anadep.model.npm.Dependencies;
 import com.hps.anadep.model.npm.PackageJson;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.response.SummaryFix;
+import com.hps.anadep.model.util.Namespace;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +40,9 @@ public class NpmTool implements PackageManagementTool {
     private ObjectMapper objectMapper;
 
     @Override
-    public ScanningResult getDependencies(boolean includeTransitive, String namespace) throws Exception {
-        String storagePackageDir = String.join("/", SCANNER_DIR, namespace);
-        String storageJson = String.join("/", SCANNER_DIR, namespace, STORAGE_JSON_FILE_NAME);
+    public ScanningResult getDependencies(boolean includeTransitive, Namespace namespace) throws Exception {
+        String storagePackageDir = String.join("/", SCANNER_DIR, namespace.getPath());
+        String storageJson = String.join("/", SCANNER_DIR, namespace.getPath(), STORAGE_JSON_FILE_NAME);
         Set<Library> libraries = new HashSet<>();
         Set<Dependency> dependencies = new HashSet<>();
         File file = new File(storageJson);
@@ -72,6 +73,7 @@ public class NpmTool implements PackageManagementTool {
                 .dependencies(dependencies)
                 .projectName(id)
                 .ecosystem(Ecosystem.MAVEN.getOsvName())
+                .path(namespace.getManifestFilePath())
                 .libraryCount(libraries.size())
                 .includeTransitive(includeTransitive)
                 .build();
@@ -101,13 +103,13 @@ public class NpmTool implements PackageManagementTool {
 
     private void processing(String storagePackageDir,String generatedFile) throws Exception {
         Process process;
+        String command = String.format("npm install --package-lock-only && npm list --all --json --package-lock-only > %s", generatedFile);
         try {
             process = Runtime.getRuntime().exec(
-                    String.format("bash script/npm-get-dependencies.sh %s %s",
-                            storagePackageDir, generatedFile));
+                    new String[]{"/bin/sh", "-c", "cd " + storagePackageDir + " && " + command});
         } catch (Exception exc) {
-            log.error(exc.getMessage());
-            throw new RuntimeException("There are something wrong with scanning");
+            process = Runtime.getRuntime().exec(
+                    new String[]{"cmd", "/c", "cd " + storagePackageDir + " && " + command});
         }
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         StreamGobbler streamGobbler =

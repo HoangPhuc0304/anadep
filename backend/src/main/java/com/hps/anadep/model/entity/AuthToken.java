@@ -26,4 +26,8 @@ public class AuthToken {
     @Column(unique=true)
     @NotEmpty
     private String githubToken;
+
+    @Column(unique=true)
+    @NotEmpty
+    private String refreshToken;
 }
