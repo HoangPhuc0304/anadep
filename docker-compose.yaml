@@ -48,7 +48,7 @@ services:
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - URL_UICLIENT=http://localhost:3000
       - URL_ANADEPCLIENT=http://host.docker.internal:8081
-      - ANADEP_DB_ENABLE=true
+      - ANADEP_DB_ENABLE=false
     deploy:
       restart_policy:
         condition: on-failure
@@ -65,9 +65,8 @@ services:
       dockerfile: Dockerfile
       args:
         - REACT_APP_BASE_URL=http://localhost:8080
-        - REACT_APP_AUTH_SCOPE=repo
         - REACT_APP_AUTH_CLIENT_ID=${GITHUB_CLIENT_ID}
-        - REACT_APP_ENABLE_ANADEP_DB=true
+        - REACT_APP_ENABLE_ANADEP_DB=false
         - DEV_TOOLS=false
     ports:
       - 3000:80
