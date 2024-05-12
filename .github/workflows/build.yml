@@ -11,7 +11,7 @@ env:
   ANADEP_SCHEDULER_ECR_REPOSITORY: anadep-scheduler
   REACT_APP_BASE_URL: https://backend.anadep.com
   REACT_APP_AUTH_CLIENT_ID: Iv1.e42995fe135712e5
-  REACT_APP_ENABLE_ANADEP_DB: false
+  REACT_APP_ENABLE_ANADEP_DB: true
   DEV_TOOLS: false
 
 permissions:

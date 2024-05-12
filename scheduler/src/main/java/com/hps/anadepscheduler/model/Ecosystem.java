@@ -5,8 +5,7 @@ import lombok.Getter;
 @Getter
 public enum Ecosystem {
     MAVEN("Maven", "https://osv-vulnerabilities.storage.googleapis.com/Maven/all.zip", "storage/maven"),
-    NPM("npm", "https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip", "storage/npm"),
-    PYPI("PyPI", "https://osv-vulnerabilities.storage.googleapis.com/PyPI/all.zip", "storage/pypi");
+    NPM("npm", "https://osv-vulnerabilities.storage.googleapis.com/npm/all.zip", "storage/npm");
 
     private final String osvName;
     private final String url;
