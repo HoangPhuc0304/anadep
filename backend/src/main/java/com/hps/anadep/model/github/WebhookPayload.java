@@ -1,7 +1,6 @@
 package com.hps.anadep.model.github;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hps.anadep.model.entity.dto.RepoDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +23,8 @@ public class WebhookPayload {
     private Committer pusher;
     private Repository repository;
     private Owner sender;
+    @JsonProperty("head_commit")
+    private WebhookHeadCommit headCommit;
+    @JsonProperty("check_suite")
+    private WebhookCheckSuite checkSuite;
 }

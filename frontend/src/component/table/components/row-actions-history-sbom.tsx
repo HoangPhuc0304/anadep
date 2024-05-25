@@ -78,7 +78,7 @@ export function DataTableRowProjectActions<TData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             projectName: row.original.fullName,
-            author: user.name || user.login,
+            author: user.login,
         },
     })
 

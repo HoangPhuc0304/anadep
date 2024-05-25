@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { remove } from '../../redux/slice/userSlice'
 import { Switch } from '../ui/switch'
 import { isInstallGithubApp } from '../../api/apiCall'
+import { ExternalLink } from 'lucide-react'
 
 const Header: React.FC = () => {
     const user: User = useSelector((state: RootState) => state.user.currentUser)
@@ -84,7 +85,7 @@ const Header: React.FC = () => {
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
                                     <p className="text-sm font-medium leading-none">
-                                        {user.name || user.login}
+                                        {user.name ? `${user.login} (${user.name})` : user.login}
                                     </p>
                                     <p className="text-xs leading-none text-muted-foreground">
                                         {user.githubUrl}
@@ -93,7 +94,12 @@ const Header: React.FC = () => {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuLabel className="flex item-center justify-between">
-                                <div>Installed GitHub App</div>
+                                <div className='flex item-center'>
+                                    <div>Installed GitHub App</div>
+                                    <Link to={`${process.env.REACT_APP_AUTH_GITHUB_APP}/installations/new` || ""} className='mx-1' target='_blank'>
+                                        <ExternalLink/>
+                                    </Link>
+                                </div>
                                 <Switch checked={isInstallApp} disabled />
                             </DropdownMenuLabel>
                             <DropdownMenuLabel className="flex item-center justify-between">

@@ -40,7 +40,7 @@ public class AnadepPropertyUtil {
         if (anadep == null || anadep.getAnalyzer() == null) {
             return null;
         }
-        return anadep.getAnalyzer().getSkips();
+        return anadep.getAnalyzer().getIgnore();
     }
 
     private Anadep readContent(File file) {

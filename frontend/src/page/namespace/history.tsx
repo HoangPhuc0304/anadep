@@ -123,7 +123,7 @@ export function History() {
                         sizes
                     )}`
                 }}
-                className="h-full min-h-[800px] max-h-[800px] items-stretch"
+                className="h-full items-stretch"
             >
                 <ResizablePanel
                     defaultSize={defaultLayout[0]}

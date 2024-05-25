@@ -15,7 +15,10 @@ public class AnadepClient {
     private WebClient.Builder webClientBuilder;
 
     public VulnerabilityOSVResponse getVulnerability(@RequestBody LibraryOSVRequest libraryOSVRequest) {
-        return webClientBuilder.build().post()
+        return webClientBuilder.codecs(codecs -> codecs
+                        .defaultCodecs()
+                        .maxInMemorySize(10000 * 1024))
+                .build().post()
                 .uri(url, builder -> builder.path("/v1/query").build())
                 .bodyValue(libraryOSVRequest)
                 .retrieve().bodyToMono(VulnerabilityOSVResponse.class).block();

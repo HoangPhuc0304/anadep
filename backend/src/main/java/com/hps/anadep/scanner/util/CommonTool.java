@@ -28,6 +28,7 @@ public class CommonTool implements PackageManagementTool {
     private AnadepPropertyUtil anadepPropertyUtil;
 
     public ScanningResult getDependencies(boolean includeTransitive, Namespace namespace) throws Exception {
+        //When zip file has 1 level
         String destinationDir = String.join("/", SCANNER_DIR, namespace.getPath());
         Ecosystem ecosystem = findEcosystem(namespace);
         if (ecosystem == null) {
@@ -40,6 +41,7 @@ public class CommonTool implements PackageManagementTool {
                         .findFirst().get();
             }
 
+            //When zip file has 2 level
             namespace.setPath(String.join("/", namespace.getPath(), folderName));
             ecosystem = findEcosystem(namespace);
         }

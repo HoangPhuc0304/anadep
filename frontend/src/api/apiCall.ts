@@ -348,12 +348,12 @@ export const getRepoById = async (repoId: string, accessToken: string) => {
 
         return response.status === 200
             ? {
-                  ...response.data,
-                  vulnerabilitySummary: {
-                      ...vulnerabilitySummary,
-                      status: getVulnerabilityStatus(vulnerabilitySummary),
-                  },
-              }
+                ...response.data,
+                vulnerabilitySummary: {
+                    ...vulnerabilitySummary,
+                    status: getVulnerabilityStatus(vulnerabilitySummary),
+                },
+            }
             : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
@@ -442,22 +442,22 @@ export const getRepos = async (accessToken: string) => {
 
         return response.status === 200
             ? await Promise.all(
-                  response.data.map(async (res: any) => {
-                      const vulnerabilitySummary =
-                          await getVulnerabilitySummary(
-                              res.vulnerabilityResult?.libs
-                          )
-                      return {
-                          ...res,
-                          vulnerabilitySummary: {
-                              ...vulnerabilitySummary,
-                              status: getVulnerabilityStatus(
-                                  vulnerabilitySummary
-                              ),
-                          },
-                      }
-                  })
-              )
+                response.data.map(async (res: any) => {
+                    const vulnerabilitySummary =
+                        await getVulnerabilitySummary(
+                            res.vulnerabilityResult?.libs
+                        )
+                    return {
+                        ...res,
+                        vulnerabilitySummary: {
+                            ...vulnerabilitySummary,
+                            status: getVulnerabilityStatus(
+                                vulnerabilitySummary
+                            ),
+                        },
+                    }
+                })
+            )
             : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message
@@ -519,35 +519,35 @@ export const getHistories = async (
         if (type === 'vulns') {
             return response.status === 200
                 ? await Promise.all(
-                      response.data.map(async (res: any) => {
-                          const vulnerabilitySummary =
-                              await getVulnerabilitySummary(
-                                  res.vulnerabilityResult?.libs
-                              )
-                          return {
-                              ...res,
-                              updatedBy: (
-                                  await getUser(res.userId, accessToken)
-                              ).login,
-                              vulnerabilitySummary: {
-                                  ...vulnerabilitySummary,
-                                  status: getVulnerabilityStatus(
-                                      vulnerabilitySummary
-                                  ),
-                              },
-                          }
-                      })
-                  )
+                    response.data.map(async (res: any) => {
+                        const vulnerabilitySummary =
+                            await getVulnerabilitySummary(
+                                res.vulnerabilityResult?.libs
+                            )
+                        return {
+                            ...res,
+                            updatedBy: (
+                                await getUser(res.userId, accessToken)
+                            ).login,
+                            vulnerabilitySummary: {
+                                ...vulnerabilitySummary,
+                                status: getVulnerabilityStatus(
+                                    vulnerabilitySummary
+                                ),
+                            },
+                        }
+                    })
+                )
                 : DEFAULT_ERROR_MESSAGE
         } else {
             return response.status === 200
-                ? response.data.map(async (res: any) => {
-                      return {
-                          ...res,
-                          updatedBy: (await getUser(res.userId, accessToken))
-                              .login,
-                      }
-                  })
+                ? await Promise.all(response.data.map(async (res: any) => {
+                    return {
+                        ...res,
+                        updatedBy: (await getUser(res.userId, accessToken))
+                            .login,
+                    }
+                }))
                 : DEFAULT_ERROR_MESSAGE
         }
     } catch (err) {
@@ -573,10 +573,10 @@ export const getHistoryById = async (
 
         return response.status === 200
             ? {
-                  ...response.data,
-                  updatedBy: (await getUser(response.data.userId, accessToken))
-                      .login,
-              }
+                ...response.data,
+                updatedBy: (await getUser(response.data.userId, accessToken))
+                    .login,
+            }
             : DEFAULT_ERROR_MESSAGE
     } catch (err) {
         return (err as Error).message

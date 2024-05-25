@@ -1,4 +1,4 @@
 scanner:
   path:
 analyzer:
-  skips:
+  ignore:

@@ -94,6 +94,7 @@ public class UiServiceImpl implements UiService {
                 History.builder()
                         .scanningResult(objectMapper.writeValueAsString(scanningResult))
                         .type(ReportType.SBOM.name())
+                        .path(scanningResult.getPath())
                         .createdAt(new Date())
                         .repo(repo)
                         .user(user).build());

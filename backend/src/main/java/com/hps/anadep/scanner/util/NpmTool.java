@@ -72,7 +72,7 @@ public class NpmTool implements PackageManagementTool {
                 .libraries(libraries)
                 .dependencies(dependencies)
                 .projectName(id)
-                .ecosystem(Ecosystem.MAVEN.getOsvName())
+                .ecosystem(Ecosystem.NPM.getOsvName())
                 .path(namespace.getManifestFilePath())
                 .libraryCount(libraries.size())
                 .includeTransitive(includeTransitive)

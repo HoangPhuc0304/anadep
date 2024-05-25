@@ -14,7 +14,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class GithubClient {
@@ -37,6 +36,8 @@ public class GithubClient {
     private static final String PULL_REQUEST_URL_FORMAT = "/repos/%s/pulls";
     private static final String SECURITY_ADVISORY_URL_FORMAT = "/repos/%s/security-advisories";
     private static final String SECURITY_ADVISORY_URL_UPDATE_FORMAT = "/repos/%s/security-advisories/%s";
+    private static final String CREATE_CHECK_RUN_URL_FORMAT = "/repos/%s/check-runs";
+    private static final String UPDATE_CHECK_RUN_URL_FORMAT = "/repos/%s/check-runs/%s";
     private static final String BEARER_TOKEN_FORMAT = "Bearer %s";
     private static final String FIX_MESSAGE = "Fix vulnerabilities";
     private static final String NAME_BOT = "Anadep Bot";
@@ -170,6 +171,22 @@ public class GithubClient {
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_FORMAT.formatted(accessToken))
                 .retrieve().bodyToMono(SecurityAdvisoryResponse[].class).block();
+    }
+
+    public CheckRunResponse createCheckRun(String fullName, CheckRunRequest request, String accessToken) {
+        return webClientBuilder.build().post()
+                .uri(url, builder -> builder.path(CREATE_CHECK_RUN_URL_FORMAT.formatted(fullName)).build())
+                .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_FORMAT.formatted(accessToken))
+                .bodyValue(request)
+                .retrieve().bodyToMono(CheckRunResponse.class).block();
+    }
+
+    public CheckRunResponse updateCheckRun(String fullName, String checkRunId, CheckRunRequest request, String accessToken) {
+        return webClientBuilder.build().patch()
+                .uri(url, builder -> builder.path(UPDATE_CHECK_RUN_URL_FORMAT.formatted(fullName, checkRunId)).build())
+                .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_FORMAT.formatted(accessToken))
+                .bodyValue(request)
+                .retrieve().bodyToMono(CheckRunResponse.class).block();
     }
 
 }

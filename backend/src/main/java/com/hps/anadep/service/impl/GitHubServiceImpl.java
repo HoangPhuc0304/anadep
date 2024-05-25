@@ -1,22 +1,25 @@
 package com.hps.anadep.service.impl;
 
 import com.hps.anadep.analyzer.client.GithubClient;
-import com.hps.anadep.analyzer.service.UiService;
 import com.hps.anadep.analyzer.service.impl.UiServiceImpl;
-import com.hps.anadep.exception.NotFoundException;
 import com.hps.anadep.model.SummaryLibraryFix;
 import com.hps.anadep.model.entity.AuthToken;
+import com.hps.anadep.model.entity.History;
 import com.hps.anadep.model.entity.Repo;
 import com.hps.anadep.model.entity.User;
+import com.hps.anadep.model.enums.CheckRunConclusion;
 import com.hps.anadep.model.enums.Ecosystem;
 import com.hps.anadep.model.enums.GitHubAction;
+import com.hps.anadep.model.enums.ReportType;
 import com.hps.anadep.model.github.*;
-import com.hps.anadep.model.mapper.RepoMapper;
+import com.hps.anadep.model.response.AnalysisResult;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.response.SummaryFix;
 import com.hps.anadep.model.ui.AnalysisUIResult;
+import com.hps.anadep.model.ui.VulnerabilitySummary;
 import com.hps.anadep.model.util.CustomMultipartFile;
 import com.hps.anadep.repository.AuthTokenRepository;
+import com.hps.anadep.repository.HistoryRepository;
 import com.hps.anadep.repository.RepoRepository;
 import com.hps.anadep.repository.UserRepository;
 import com.hps.anadep.scanner.util.MavenTool;
@@ -25,16 +28,19 @@ import com.hps.anadep.scanner.util.PackageManagementTool;
 import com.hps.anadep.service.GitHubService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.hps.anadep.evaluator.service.impl.EvaluateServiceImpl.APPLY_TO_FIX;
@@ -58,7 +64,11 @@ public class GitHubServiceImpl implements GitHubService {
     @Autowired
     private AuthTokenRepository authTokenRepository;
 
+    @Autowired
+    private HistoryRepository historyRepository;
+
     private UiServiceImpl uiServiceImpl;
+    private AppServiceImpl appServiceImpl;
 
     @Value("${anadep.db.enable}")
     private Boolean anadepDbEnable;
@@ -82,8 +92,9 @@ public class GitHubServiceImpl implements GitHubService {
     private static final String CONTENT_TYPE = "application/octet-stream";
 
     @Autowired
-    public GitHubServiceImpl(@Lazy UiServiceImpl uiServiceImpl) {
+    public GitHubServiceImpl(@Lazy UiServiceImpl uiServiceImpl, @Lazy AppServiceImpl appServiceImpl) {
         this.uiServiceImpl = uiServiceImpl;
+        this.appServiceImpl = appServiceImpl;
     }
 
     @Override
@@ -143,7 +154,8 @@ public class GitHubServiceImpl implements GitHubService {
                 AuthToken authToken = authTokenRepository.findByUser(user).orElseThrow(
                         () -> new RuntimeException(String.format("The user with id [%s] doesn't have token", user.getId())));
 
-                byte[] bytes = null;
+                byte[] bytes;
+                CheckRunResponse checkResponse = null;
                 try {
                     bytes = githubClient.download(repo.getFullName(), authToken.getGithubToken());
                 } catch (Exception e) {
@@ -155,6 +167,23 @@ public class GitHubServiceImpl implements GitHubService {
                     bytes = githubClient.download(repo.getFullName(), authToken.getGithubToken());
                 }
 
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+                if (!action.equals(GitHubAction.PUSH)) {
+                    CheckRunRequest checkRequest = CheckRunRequest.builder()
+                            .name("anadep/scan-vunerabilities")
+                            .headSha(webhookPayload.getCheckSuite().getHeadSha())
+                            .status("in_progress")
+                            .startedAt(LocalDateTime.now().atOffset(ZoneOffset.UTC).format(formatter))
+                            .output(CheckRunOutput.builder()
+                                    .title("Scan Vulnerabilities")
+                                    .summary("The vulnerabilities scanning on branch %s done by %s".formatted(repo.getDefaultBranch(), owner.getLogin()))
+                                    .text("The action can be taken in minutes")
+                                    .build())
+                            .build();
+                    checkResponse = githubClient.createCheckRun(repo.getFullName(), checkRequest, authToken.getGithubToken());
+                    log.info("Start scanning vulnerabilities");
+                }
+
                 String version;
                 if (anadepDbEnable) {
                     version = V2;
@@ -162,20 +191,68 @@ public class GitHubServiceImpl implements GitHubService {
                     version = V1;
                 }
 
-                if (bytes != null) {
-                    CustomMultipartFile customMultipartFile = new CustomMultipartFile(NAME_FIELD, DEFAULT_ORIGIN_FILE, CONTENT_TYPE, bytes);
-                    AnalysisUIResult analysisUIResult = uiServiceImpl.getAnalysisUIResult(
-                            customMultipartFile,
-                            false,
-                            repo,
-                            version,
-                            user.getId()
-                    );
+                if (action.equals(GitHubAction.PUSH)) {
+                    if (bytes != null) {
+                        createAnalysisUIResult(repo, user, version, bytes);
+                    }
+                } else {
+                    CheckRunRequest updateRequest = new CheckRunRequest();
+                    try {
+                        if (bytes != null) {
+                            AnalysisUIResult analysisUIResult = createAnalysisUIResult(null, null, version, bytes);
+                            updateConclusionResult(updateRequest, checkResponse, analysisUIResult);
+                        } else {
+                            updateRequest.setConclusion(CheckRunConclusion.SKIPPED.getName());
+                        }
+                    } catch (Exception e) {
+                        updateRequest.setConclusion(CheckRunConclusion.CANCELLED.getName());
+                    }
+
+                    if (checkResponse != null && StringUtils.hasText(checkResponse.getId())) {
+                        updateRequest.setCompletedAt(LocalDateTime.now().atOffset(ZoneOffset.UTC).format(formatter));
+                        githubClient.updateCheckRun(repo.getFullName(), checkResponse.getId(), updateRequest, authToken.getGithubToken());
+                        log.info("Complete scanning vulnerabilities");
+                    }
                 }
+
             }
         } catch (Exception e) {
             log.error("Error handle delivery with massage: {}", e.getMessage());
         }
+    }
+
+    private AnalysisUIResult createAnalysisUIResult(Repo repo, User user, String version, byte[] bytes) throws Exception {
+        CustomMultipartFile customMultipartFile = new CustomMultipartFile(NAME_FIELD, DEFAULT_ORIGIN_FILE, CONTENT_TYPE, bytes);
+        if (repo == null || user == null) {
+            AnalysisResult analysisResult;
+            if (version.equals(V1)) {
+                analysisResult = appServiceImpl.analyze(customMultipartFile, false);
+            } else {
+                analysisResult = appServiceImpl.analyzeV2(customMultipartFile, false);
+            }
+            return appServiceImpl.reformat(analysisResult);
+        }
+
+        return uiServiceImpl.getAnalysisUIResult(
+                customMultipartFile,
+                false,
+                repo,
+                version,
+                user.getId()
+        );
+    }
+
+    private void updateConclusionResult(CheckRunRequest updateRequest, CheckRunResponse checkResponse, AnalysisUIResult analysisUIResult) {
+        VulnerabilitySummary vulnerabilitySummary = uiServiceImpl.summary(analysisUIResult);
+        if (vulnerabilitySummary.getCritical() > 0 || vulnerabilitySummary.getHigh() > 0) {
+            updateRequest.setConclusion(CheckRunConclusion.FAILURE.getName());
+        } else {
+            updateRequest.setConclusion(CheckRunConclusion.SUCCESS.getName());
+        }
+        CheckRunOutput output = checkResponse.getOutput();
+        String content = createOutPutContent(analysisUIResult, vulnerabilitySummary);
+        output.setText(content);
+        updateRequest.setOutput(output);
     }
 
     private AccessTokenResponse getAccessTokenResponse(String response) {
@@ -200,21 +277,29 @@ public class GitHubServiceImpl implements GitHubService {
     }
 
     private boolean validateValidAction(WebhookPayload webhookPayload, GitHubAction action) {
-        if (action.equals(GitHubAction.PUSH)) {
+        if (action.equals(GitHubAction.PUSH) || action.equals(GitHubAction.CHECK_SUITE)) {
             Long repoId = webhookPayload.getRepository().getId();
-            String ref = webhookPayload.getRef();
-
             Repo repo = repoRepository.findByGithubRepoId(repoId).orElse(null);
-            if (repo != null && ref.matches(REF_BRANCH_PATTERN)) {
-                String branch = ref.split("/")[2];
-                if (branch.equals(webhookPayload.getRepository().getDefaultBranch())) {
-                    BeanUtils.copyProperties(webhookPayload.getRepository(), repo, "id", "user", "owner");
-                    repo.setGithubRepoId(webhookPayload.getRepository().getId());
-                    repo.setOwner(webhookPayload.getRepository().getOwner().getLogin());
-                    repo.setPublic(!webhookPayload.getRepository().isPrivate());
-                    repoRepository.save(repo);
-                    return true;
+            if (repo == null) {
+                return false;
+            }
+            BeanUtils.copyProperties(webhookPayload.getRepository(), repo, "id", "user", "owner");
+            repo.setGithubRepoId(webhookPayload.getRepository().getId());
+            repo.setOwner(webhookPayload.getRepository().getOwner().getLogin());
+            repo.setPublic(!webhookPayload.getRepository().isPrivate());
+
+            if (action.equals(GitHubAction.PUSH)) {
+                String ref = webhookPayload.getRef();
+                if (ref.matches(REF_BRANCH_PATTERN)) {
+                    String branch = ref.split("/")[2];
+                    if (branch.equals(webhookPayload.getRepository().getDefaultBranch())) {
+                        repoRepository.save(repo);
+                        return true;
+                    }
                 }
+            } else {
+                repoRepository.save(repo);
+                return true;
             }
         }
         return false;
@@ -301,6 +386,20 @@ public class GitHubServiceImpl implements GitHubService {
                     "  </tr>");
         });
         sb.append("</table>\n");
+        return sb.toString();
+    }
+
+    private String createOutPutContent(AnalysisUIResult analysisUIResult, VulnerabilitySummary vulnerabilitySummary) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("<p>There are %s vulnerable dependencies with %s security issues</p>\n",
+                analysisUIResult.getIssuesCount(),
+                analysisUIResult.getLibs().size()));
+        sb.append("<ul>");
+        sb.append("<li>Found %s Critical</li>".formatted(vulnerabilitySummary.getCritical()));
+        sb.append("<li>Found %s High</li>".formatted(vulnerabilitySummary.getHigh()));
+        sb.append("<li>Found %s Medium</li>".formatted(vulnerabilitySummary.getMedium()));
+        sb.append("<li>Found %s Low</li>".formatted(vulnerabilitySummary.getLow()));
+        sb.append("</ul>");
         return sb.toString();
     }
 }

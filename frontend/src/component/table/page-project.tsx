@@ -114,7 +114,7 @@ export default function ProjectPage() {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction>
                             <Link
-                                to={`https://github.com/apps/anadep-auth-app/installations/new`}
+                                to={`${process.env.REACT_APP_AUTH_GITHUB_APP}/installations/new`}
                             >
                                 Go to GitHub App
                             </Link>

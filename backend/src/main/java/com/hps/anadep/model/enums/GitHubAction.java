@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum GitHubAction {
-    PUSH("push"), PULL_REQUEST("pull_request");
+    PUSH("push"), CHECK_SUITE("check_suite");
 
     private final String name;
 

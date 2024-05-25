@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AnadepAnalyzer {
-    private List<String> skips;
+    private List<String> ignore;
 }
