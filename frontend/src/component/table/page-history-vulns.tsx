@@ -51,7 +51,6 @@ export default function HistoryVulnsPage({
     const [repoData, setRepoData] = useState<Repository>()
     const [historyData, setHistoryData] = useState<History>()
     const [fixResult, setFixResult] = useState<FixResult>()
-    const [loading, setLoading] = useState<boolean>(true)
     const { toast } = useToast()
     const user: User = useSelector((state: RootState) => state.user.currentUser)
 
@@ -106,23 +105,22 @@ export default function HistoryVulnsPage({
         }
     }
 
-    const fetchData = async () => {
-        if (historyData?.vulnerabilityResult) {
-            const data = await getAutoFix(historyData.vulnerabilityResult)
+    const fetchData = async (h: History) => {
+        if (h?.vulnerabilityResult) {
+            const data = await getAutoFix(h.vulnerabilityResult)
             if (typeof data === 'string') {
                 handlingToastAction(ERROR_LABEL, data || DEFAULT_ERROR_MESSAGE)
             } else {
                 setFixResult(data)
             }
-            setLoading(false)
         }
     }
 
     useEffect(() => {
         setRepoData(repo)
         setHistoryData(history)
-        fixAvailable && fetchData()
-    }, [repo, history])
+        history && fixAvailable && fetchData(history)
+    }, [repo, history, fixAvailable])
 
     return (
         <div className="mx-auto">
@@ -403,35 +401,7 @@ export default function HistoryVulnsPage({
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {loading
-                                                        ? Array(10)
-                                                              .fill({})
-                                                              .map(
-                                                                  (
-                                                                      val,
-                                                                      index
-                                                                  ) => (
-                                                                      <TableRow
-                                                                          key={
-                                                                              index
-                                                                          }
-                                                                      >
-                                                                          <TableCell>
-                                                                              <Skeleton className="h-[24px] w-full" />
-                                                                          </TableCell>
-                                                                          <TableCell>
-                                                                              <Skeleton className="h-[24px] w-full" />
-                                                                          </TableCell>
-                                                                          <TableCell>
-                                                                              <Skeleton className="h-[24px] w-full" />
-                                                                          </TableCell>
-                                                                          <TableCell>
-                                                                              <Skeleton className="h-[24px] w-full" />
-                                                                          </TableCell>
-                                                                      </TableRow>
-                                                                  )
-                                                              )
-                                                        : fixResult?.libs.map(
+                                                    {fixResult?.libs.map(
                                                               (lib, index) => (
                                                                   <TableRow
                                                                       key={

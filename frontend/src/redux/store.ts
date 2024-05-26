@@ -1,5 +1,5 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
-import storageSession from 'redux-persist/lib/storage/session'
+import storage from 'redux-persist/lib/storage'
 import {
     FLUSH,
     PAUSE,
@@ -14,11 +14,12 @@ import vulnScanSlice from './slice/vulnScanSlice'
 import vulnSearchSlice from './slice/vulnSearchSlice'
 import sbomSlice from './slice/sbomSlice'
 import userSlice from './slice/userSlice'
+import settingSlice from './slice/settingSlice'
 
 const persistConfig = {
     key: 'root',
     version: 1,
-    storage: storageSession,
+    storage: storage,
 }
 
 const rootReducer = combineReducers({
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
     vulnSearch: vulnSearchSlice.reducer,
     sbom: sbomSlice.reducer,
     user: userSlice.reducer,
+    setting: settingSlice.reducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

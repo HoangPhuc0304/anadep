@@ -1,5 +1,6 @@
 import { severities } from '../data/helper'
 import { LibraryUI, VulnerabilitySummary } from '../model/library'
+import { store } from '../redux/store'
 
 export const getLibrarySearch = (
     libraries: LibraryUI[],
@@ -35,4 +36,8 @@ export const getVulnerabilityStatus = (
         return severities[0].value
     }
     return 'No issues'
+}
+
+export function getAnadepEnable() {
+    return store.getState().setting.anadepEnable
 }

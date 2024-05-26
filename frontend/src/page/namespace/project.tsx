@@ -4,6 +4,7 @@ import {
     AlertCircle,
     Archive,
     Boxes,
+    BugOff,
     GitPullRequestArrow,
     MessagesSquare,
     Search,
@@ -101,10 +102,7 @@ export function Project() {
                             isCollapsed ? 'h-[52px]' : 'px-2'
                         )}
                     >
-                        <AccountSwitcher
-                            isCollapsed={isCollapsed}
-                            accounts={accounts}
-                        />
+                        <BugOff />
                     </div>
                     <Separator />
                     <Nav
@@ -117,7 +115,7 @@ export function Project() {
                                 variant: 'ghost',
                             },
                             {
-                                title: 'Vulnerability',
+                                title: 'SCA',
                                 href: '/namespace',
                                 icon: ShieldCheck,
                                 variant: 'ghost',
@@ -136,46 +134,10 @@ export function Project() {
                             },
                         ]}
                     />
-                    <Separator />
-                    <Nav
-                        isCollapsed={isCollapsed}
-                        links={[
-                            {
-                                title: 'Social',
-                                label: '972',
-                                icon: Users2,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Updates',
-                                label: '342',
-                                icon: AlertCircle,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Forums',
-                                label: '128',
-                                icon: MessagesSquare,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Shopping',
-                                label: '8',
-                                icon: ShoppingCart,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Promotions',
-                                label: '21',
-                                icon: Archive,
-                                variant: 'ghost',
-                            },
-                        ]}
-                    />
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-                    <Tabs defaultValue="all" className="relative z-10">
+                    <Tabs defaultValue="all" className="relative z-1">
                         <div className="flex h-[52px] justify-between items-center px-4 py-2 z-1">
                             <h1 className="text-xl font-bold">Project</h1>
                         </div>

@@ -1,7 +1,6 @@
 import {
     AnalysisUIResult,
     LibraryScanUI,
-    LibraryUI,
     ReportForm,
     Repository,
     ScanningResult,
@@ -9,10 +8,7 @@ import {
 } from '../model/library'
 import { DEFAULT_ERROR_MESSAGE } from '../common/common'
 import { client, githubClient } from '../config/requestConfig'
-import { wait } from '@testing-library/user-event/dist/utils'
-import { getVulnerabilityStatus } from '../util/util'
-import { any } from 'zod'
-import { createTokenAuth } from '@octokit/auth-token'
+import { getAnadepEnable, getVulnerabilityStatus } from '../util/util'
 import { Octokit } from 'octokit'
 
 export const getAnalysisUIResult = async (file: File) => {
@@ -20,7 +16,7 @@ export const getAnalysisUIResult = async (file: File) => {
         const formData = new FormData()
         formData.append('file', file)
         const response = await client.post(
-            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+            getAnadepEnable()
                 ? '/ui/analyze/v2'
                 : '/ui/analyze',
             formData,
@@ -45,7 +41,7 @@ export const getAuthAnalysisUIResult = async (
         const formData = new FormData()
         formData.append('file', file)
         const response = await client.post(
-            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+            getAnadepEnable()
                 ? `/ui/analyze/v2/repo/${repoId}`
                 : `/ui/analyze/repo/${repoId}`,
             formData,
@@ -82,7 +78,7 @@ export const downloadFileFormGitHubUrl = async (
 export const getVulnerabilityFromId = async (databaseId: string) => {
     try {
         const response = await client.get(
-            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+            getAnadepEnable()
                 ? `/ui/vulns/${databaseId}/v2`
                 : `/ui/vulns/${databaseId}`
         )
@@ -99,7 +95,7 @@ export const getSearchUIResult = async (
 ) => {
     try {
         const response = await client.post(
-            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+            getAnadepEnable()
                 ? '/ui/retrieve/v2'
                 : '/ui/retrieve',
             {
@@ -654,7 +650,7 @@ export const createSecurityAdvisory = async (
 ) => {
     try {
         const response = await client.post(
-            process.env.REACT_APP_ENABLE_ANADEP_DB === 'true'
+            getAnadepEnable()
                 ? `/api/security-advisories/v2/repo/${repoId}/history/${historyId}`
                 : `/api/security-advisories/repo/${repoId}/history/${historyId}`,
             {},

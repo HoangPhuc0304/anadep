@@ -93,6 +93,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
             executorService.shutdown();
         } catch (Exception e) {
             log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
 
         analysisResult.setLibs(libraryScans);
@@ -127,6 +128,7 @@ public class AnalyzerServiceImpl implements AnalyzerService {
             }
         } catch (Exception e) {
             log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
 
         analysisResult.setLibs(libraryScans);

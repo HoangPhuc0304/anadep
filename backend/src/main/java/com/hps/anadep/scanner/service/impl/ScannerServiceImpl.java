@@ -41,7 +41,7 @@ public class ScannerServiceImpl implements ScannerService {
             PackageManagementTool packageManagementTool = applicationContext.getBean(CommonTool.class);
             try {
                 fileService.save(file, filename, namespace);
-                Namespace space = new Namespace(String.join("/", namespace, folderName), null);
+                Namespace space = new Namespace(String.join("/", namespace, folderName), null, null);
                 return packageManagementTool.getDependencies(includeTransitive, space);
             } finally {
                 fileService.clean(String.join("/", SCANNER_DIR, namespace));
@@ -59,7 +59,7 @@ public class ScannerServiceImpl implements ScannerService {
             }
             try {
                 fileService.save(file, ecosystem.getPackageManagementFile(), namespace);
-                Namespace space = new Namespace(namespace, null);
+                Namespace space = new Namespace(namespace, null, null);
                 return packageManagementTool.getDependencies(includeTransitive, space);
             } finally {
                 fileService.clean(String.join("/", SCANNER_DIR, namespace));

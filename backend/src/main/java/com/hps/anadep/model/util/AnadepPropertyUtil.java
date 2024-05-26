@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.hps.anadep.model.anadep.Anadep;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.List;
@@ -29,18 +30,18 @@ public class AnadepPropertyUtil {
 
     public String getScanPath(File file) {
         Anadep anadep = readAnadepFile(file);
-        if (anadep == null || anadep.getScanner() == null) {
+        if (anadep == null || anadep.getScanner() == null || anadep.getScanner().getPath() == null) {
             return null;
         }
-        return anadep.getScanner().getPath();
+        return anadep.getScanner().getPath().strip();
     }
 
-    public List<String> getSkipDependencies(File file) {
+    public List<String> getIgnoreDependencies(File file) {
         Anadep anadep = readAnadepFile(file);
-        if (anadep == null || anadep.getAnalyzer() == null) {
+        if (anadep == null || anadep.getAnalyzer() == null|| anadep.getAnalyzer().getIgnore() == null) {
             return null;
         }
-        return anadep.getAnalyzer().getIgnore();
+        return anadep.getAnalyzer().getIgnore().stream().map(String::strip).filter(StringUtils::hasText).toList();
     }
 
     private Anadep readContent(File file) {

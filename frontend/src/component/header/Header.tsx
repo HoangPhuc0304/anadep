@@ -22,12 +22,15 @@ import { remove } from '../../redux/slice/userSlice'
 import { Switch } from '../ui/switch'
 import { isInstallGithubApp } from '../../api/apiCall'
 import { ExternalLink } from 'lucide-react'
+import { getAnadepEnable } from '../../util/util'
+import { updateAnadepEnable } from '../../redux/slice/settingSlice'
 
 const Header: React.FC = () => {
     const user: User = useSelector((state: RootState) => state.user.currentUser)
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const [isInstallApp, setIsInstallApp] = useState<boolean>(true)
+    const [isChecked, setChecked] = useState(getAnadepEnable)
 
     const handlingLogout = () => {
         dispatch(remove(user))
@@ -44,6 +47,13 @@ const Header: React.FC = () => {
                 setIsInstallApp(false)
             }
         }
+    }
+
+    const handleChecked = () => {
+        dispatch(updateAnadepEnable({
+            anadepEnable: !isChecked
+        }))
+        setChecked(!isChecked)
     }
 
     useEffect(() => {
@@ -105,12 +115,8 @@ const Header: React.FC = () => {
                             <DropdownMenuLabel className="flex item-center justify-between">
                                 <div>Using Anadep Database</div>
                                 <Switch
-                                    checked={
-                                        process.env
-                                            .REACT_APP_ENABLE_ANADEP_DB ===
-                                        'true'
-                                    }
-                                    disabled
+                                    checked={isChecked}
+                                    onCheckedChange={handleChecked}
                                 />
                             </DropdownMenuLabel>
                             <DropdownMenuLabel className="flex item-center justify-between">

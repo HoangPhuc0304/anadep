@@ -49,8 +49,12 @@ public class GithubClient {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
-    public byte[] download(String repo, String accessToken) {
+    public byte[] download(String repo, String accessToken, String branch) {
         RequestCallback requestCallback = null;
+
+        String uri = StringUtils.hasText(branch)
+                ? "%s/repos/%s/zipball/%s".formatted(url, repo, branch)
+                : "%s/repos/%s/zipball".formatted(url, repo);
 
         if (StringUtils.hasText(accessToken)) {
             requestCallback = request -> {
@@ -60,7 +64,7 @@ public class GithubClient {
         }
 
         return restTemplate.execute(
-                String.format("%s/repos/%s/zipball", url, repo),
+                uri,
                 HttpMethod.GET,
                 requestCallback,
                 clientHttpResponse -> clientHttpResponse.getBody().readAllBytes()

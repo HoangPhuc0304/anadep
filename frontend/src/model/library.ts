@@ -166,3 +166,7 @@ export interface FixResult {
     ecosystem: string
     responseTime: number
 }
+
+export interface Setting {
+    anadepEnable: boolean
+}

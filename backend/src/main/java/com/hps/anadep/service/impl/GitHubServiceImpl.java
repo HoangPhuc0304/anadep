@@ -2,6 +2,7 @@ package com.hps.anadep.service.impl;
 
 import com.hps.anadep.analyzer.client.GithubClient;
 import com.hps.anadep.analyzer.service.impl.UiServiceImpl;
+import com.hps.anadep.evaluator.enums.Severity;
 import com.hps.anadep.model.SummaryLibraryFix;
 import com.hps.anadep.model.entity.AuthToken;
 import com.hps.anadep.model.entity.History;
@@ -16,6 +17,7 @@ import com.hps.anadep.model.response.AnalysisResult;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.response.SummaryFix;
 import com.hps.anadep.model.ui.AnalysisUIResult;
+import com.hps.anadep.model.ui.LibraryScanUI;
 import com.hps.anadep.model.ui.VulnerabilitySummary;
 import com.hps.anadep.model.util.CustomMultipartFile;
 import com.hps.anadep.repository.AuthTokenRepository;
@@ -34,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -43,6 +46,8 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.hps.anadep.evaluator.enums.Severity.*;
+import static com.hps.anadep.evaluator.enums.Severity.HIGH;
 import static com.hps.anadep.evaluator.service.impl.EvaluateServiceImpl.APPLY_TO_FIX;
 import static com.hps.anadep.evaluator.service.impl.EvaluateServiceImpl.REFER_TO_FIX;
 
@@ -78,6 +83,7 @@ public class GitHubServiceImpl implements GitHubService {
     private static final String AFTER_FILE_FORMAT = "storage/fix/after/%s";
     private static final String FILE_FORMAT = "%s/%s";
     private static final String FIX_BRANCH_FORMAT = "anadep-fix-%s";
+    private static final String SUMMARY_DEPENDENCY_FORMAT = "%s/%s:%s";
     private static final String REF_BRANCH_PATTERN = "^refs/heads/.+";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
@@ -154,17 +160,22 @@ public class GitHubServiceImpl implements GitHubService {
                 AuthToken authToken = authTokenRepository.findByUser(user).orElseThrow(
                         () -> new RuntimeException(String.format("The user with id [%s] doesn't have token", user.getId())));
 
+                String bracnh = null;
+                if (!action.equals(GitHubAction.PUSH) && webhookPayload.getCheckSuite() != null) {
+                    bracnh = webhookPayload.getCheckSuite().getHeadBranch();
+                }
+
                 byte[] bytes;
                 CheckRunResponse checkResponse = null;
                 try {
-                    bytes = githubClient.download(repo.getFullName(), authToken.getGithubToken());
+                    bytes = githubClient.download(repo.getFullName(), authToken.getGithubToken(), bracnh);
                 } catch (Exception e) {
                     RefreshTokenRequest request = new RefreshTokenRequest(authToken.getUser().getId(), authToken.getRefreshToken());
                     AccessTokenResponse response = getRefreshToken(request);
                     authToken.setGithubToken(response.getAccessToken());
                     authToken.setRefreshToken(response.getRefreshToken());
                     authTokenRepository.save(authToken);
-                    bytes = githubClient.download(repo.getFullName(), authToken.getGithubToken());
+                    bytes = githubClient.download(repo.getFullName(), authToken.getGithubToken(), bracnh);
                 }
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
@@ -390,16 +401,111 @@ public class GitHubServiceImpl implements GitHubService {
     }
 
     private String createOutPutContent(AnalysisUIResult analysisUIResult, VulnerabilitySummary vulnerabilitySummary) {
+        HashMap<Severity, Set<String>> scanningMap = new HashMap<>();
+        scanningMap.put(LOW, new HashSet<>());
+        scanningMap.put(MEDIUM, new HashSet<>());
+        scanningMap.put(HIGH, new HashSet<>());
+        scanningMap.put(CRITICAL, new HashSet<>());
+        scanningMap.put(NONE, new HashSet<>());
+
+        analysisUIResult.getLibs().forEach(libraryScanUI -> {
+            List<com.hps.anadep.model.osv.Severity> severities = libraryScanUI.getVuln().getSeverity();
+            if (!CollectionUtils.isEmpty(severities)) {
+                Severity severity = Severity.getSeverityFromName(severities.get(0).getRanking());
+                switch (severity) {
+                    case LOW -> {
+                        Set<String> lows = scanningMap.getOrDefault(LOW, new HashSet<>());
+                        lows.add(SUMMARY_DEPENDENCY_FORMAT.formatted(
+                                libraryScanUI.getInfo().getEcosystem(),
+                                libraryScanUI.getInfo().getName(),
+                                libraryScanUI.getInfo().getVersion()));
+                        scanningMap.put(LOW, lows);
+                    }
+                    case MEDIUM -> {
+                        Set<String> mediums = scanningMap.getOrDefault(MEDIUM, new HashSet<>());
+                        mediums.add(SUMMARY_DEPENDENCY_FORMAT.formatted(
+                                libraryScanUI.getInfo().getEcosystem(),
+                                libraryScanUI.getInfo().getName(),
+                                libraryScanUI.getInfo().getVersion()));
+                        scanningMap.put(MEDIUM, mediums);
+                    }
+                    case HIGH -> {
+                        Set<String> highs = scanningMap.getOrDefault(HIGH, new HashSet<>());
+                        highs.add(SUMMARY_DEPENDENCY_FORMAT.formatted(
+                                libraryScanUI.getInfo().getEcosystem(),
+                                libraryScanUI.getInfo().getName(),
+                                libraryScanUI.getInfo().getVersion()));
+                        scanningMap.put(HIGH, highs);
+                    }
+                    case CRITICAL -> {
+                        Set<String> criticals = scanningMap.getOrDefault(CRITICAL, new HashSet<>());
+                        criticals.add(SUMMARY_DEPENDENCY_FORMAT.formatted(
+                                libraryScanUI.getInfo().getEcosystem(),
+                                libraryScanUI.getInfo().getName(),
+                                libraryScanUI.getInfo().getVersion()));
+                        scanningMap.put(CRITICAL, criticals);
+                    }
+                    default -> {
+                        Set<String> nones = scanningMap.getOrDefault(NONE, new HashSet<>());
+                        nones.add(SUMMARY_DEPENDENCY_FORMAT.formatted(
+                                libraryScanUI.getInfo().getEcosystem(),
+                                libraryScanUI.getInfo().getName(),
+                                libraryScanUI.getInfo().getVersion()));
+                        scanningMap.put(NONE, nones);
+                    }
+                }
+            }
+        });
+
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("<p>There are %s vulnerable dependencies with %s security issues</p>\n",
-                analysisUIResult.getIssuesCount(),
-                analysisUIResult.getLibs().size()));
-        sb.append("<ul>");
-        sb.append("<li>Found %s Critical</li>".formatted(vulnerabilitySummary.getCritical()));
-        sb.append("<li>Found %s High</li>".formatted(vulnerabilitySummary.getHigh()));
-        sb.append("<li>Found %s Medium</li>".formatted(vulnerabilitySummary.getMedium()));
-        sb.append("<li>Found %s Low</li>".formatted(vulnerabilitySummary.getLow()));
-        sb.append("</ul>");
+        sb.append(String.format("<h4>There are %s security issues at %s vulnerable dependencies</h4>\n",
+                analysisUIResult.getLibs().size(),
+                analysisUIResult.getIssuesCount()));
+
+        sb.append("<p>Found %s Critical security issues at %s dependencies</p>".formatted(
+                vulnerabilitySummary.getCritical(),
+                scanningMap.get(CRITICAL).size()));
+        if (!CollectionUtils.isEmpty(scanningMap.get(CRITICAL))) {
+            sb.append("<ul>");
+            scanningMap.get(CRITICAL).forEach(s -> {
+                sb.append("<li>%s</li>".formatted(s));
+            });
+            sb.append("</ul>");
+        }
+
+        sb.append("<p>Found %s High security issues at %s dependencies</p>".formatted(
+                vulnerabilitySummary.getHigh(),
+                scanningMap.get(HIGH).size()));
+        if (!CollectionUtils.isEmpty(scanningMap.get(HIGH))) {
+            sb.append("<ul>");
+            scanningMap.get(HIGH).forEach(s -> {
+                sb.append("<li>%s</li>".formatted(s));
+            });
+            sb.append("</ul>");
+        }
+
+        sb.append("<p>Found %s Medium security issues at %s dependencies</p>".formatted(
+                vulnerabilitySummary.getMedium(),
+                scanningMap.get(MEDIUM).size()));
+        if (!CollectionUtils.isEmpty(scanningMap.get(MEDIUM))) {
+            sb.append("<ul>");
+            scanningMap.get(MEDIUM).forEach(s -> {
+                sb.append("<li>%s</li>".formatted(s));
+            });
+            sb.append("</ul>");
+        }
+
+        sb.append("<p>Found %s Low security issues at %s dependencies</p>".formatted(
+                vulnerabilitySummary.getLow(),
+                scanningMap.get(LOW).size()));
+        if (!CollectionUtils.isEmpty(scanningMap.get(LOW))) {
+            sb.append("<ul>");
+            scanningMap.get(LOW).forEach(s -> {
+                sb.append("<li>%s</li>".formatted(s));
+            });
+            sb.append("</ul>");
+        }
+
         return sb.toString();
     }
 }

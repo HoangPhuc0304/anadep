@@ -135,7 +135,7 @@ public class UiServiceImpl implements UiService {
     @Override
     public byte[] repoDownload(String url, String accessToken) {
         String repo = getRepoFromGithubUrl(url);
-        return githubClient.download(repo, accessToken);
+        return githubClient.download(repo, accessToken, null);
     }
 
     @Override
@@ -157,7 +157,7 @@ public class UiServiceImpl implements UiService {
         analysisUIResult.getLibs().forEach(result -> {
             List<com.hps.anadep.model.osv.Severity> severities = result.getVuln().getSeverity();
             if (!CollectionUtils.isEmpty(severities)) {
-                Severity severity = Severity.getSeverityFromName(result.getVuln().getSeverity().get(0).getRanking());
+                Severity severity = Severity.getSeverityFromName(severities.get(0).getRanking());
                 switch (severity) {
                     case LOW -> vulnerabilitySummary.setLow(vulnerabilitySummary.getLow() + 1);
                     case MEDIUM -> vulnerabilitySummary.setMedium(vulnerabilitySummary.getMedium() + 1);

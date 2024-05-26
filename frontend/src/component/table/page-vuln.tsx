@@ -136,8 +136,6 @@ export default function VulnerabilityPage({
             dispatch(update({ ...analysisUIResult, libs: Array(10).fill({}) }))
     }, [loading])
 
-    console.log(analysisUIResult.libs)
-
     // return (
     //   <>
     //     <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">

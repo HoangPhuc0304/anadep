@@ -8,12 +8,14 @@ import com.hps.anadep.model.util.Namespace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -75,17 +77,9 @@ public class CommonTool implements PackageManagementTool {
         Path destinationPath = Path.of(destinationDir);
         Ecosystem ecosystem = null;
         if (ymlFile.exists() && ymlFile.isFile()) {
-            String path = anadepPropertyUtil.getScanPath(ymlFile);
-            if (StringUtils.hasText(path)) {
-                destinationPath = destinationPath.resolve(path);
-                namespace.setManifestFilePath(path);
-            }
+            destinationPath = getPath(namespace, ymlFile, destinationPath);
         } else if (yamlFile.exists() && yamlFile.isFile()) {
-            String path = anadepPropertyUtil.getScanPath(yamlFile);
-            if (StringUtils.hasText(path)) {
-                destinationPath = destinationPath.resolve(path);
-                namespace.setManifestFilePath(path);
-            }
+            destinationPath = getPath(namespace, yamlFile, destinationPath);
         }
 
         File destinationFile = destinationPath.toFile();
@@ -110,6 +104,21 @@ public class CommonTool implements PackageManagementTool {
         }
 
         return ecosystem;
+    }
+
+    private Path getPath(Namespace namespace, File file, Path destinationPath) {
+        String path = anadepPropertyUtil.getScanPath(file);
+        List<String> dependencyIgnores = anadepPropertyUtil.getIgnoreDependencies(file);
+        if (StringUtils.hasText(path)) {
+            destinationPath = destinationPath.resolve(path);
+            namespace.setManifestFilePath(path);
+        }
+
+        if (!CollectionUtils.isEmpty(dependencyIgnores)) {
+            namespace.setIgnore(dependencyIgnores);
+        }
+
+        return destinationPath;
     }
 
     @Override

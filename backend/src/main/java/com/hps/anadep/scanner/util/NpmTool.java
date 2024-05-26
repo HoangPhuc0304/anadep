@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -34,7 +35,6 @@ public class NpmTool implements PackageManagementTool {
     private static final String NPM_FORMAT_ID = "%s:%s";
     private static final String BEFORE_FILE_FORMAT = "storage/fix/before/%s";
     private static final String AFTER_FILE_FORMAT = "storage/fix/after/%s";
-    private static final String DEPENDENCY_NAME_FORMAT = "%s:%s";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -57,6 +57,9 @@ public class NpmTool implements PackageManagementTool {
         String id = NPM_FORMAT_ID.formatted(deps.getName(), deps.getVersion());
 
         populateData(deps.getDependencies(), libraries, dependencies, id);
+        if (!CollectionUtils.isEmpty(namespace.getIgnore())) {
+            updateIgnoreDependencies(libraries, dependencies, namespace.getIgnore());
+        }
 
         if (!includeTransitive) {
             Map<String, Library> libMap = libraries.stream().collect(Collectors.toMap(
@@ -77,6 +80,19 @@ public class NpmTool implements PackageManagementTool {
                 .libraryCount(libraries.size())
                 .includeTransitive(includeTransitive)
                 .build();
+    }
+
+    private void updateIgnoreDependencies(Set<Library> libraries, Set<Dependency> dependencies, List<String> ignore) {
+        Set<String> ignoreSet = ignore.stream().map(dependency ->
+                dependency.split(":")[0]).collect(Collectors.toSet());
+
+        libraries.removeIf(library -> ignoreSet.contains(library.getName()));
+
+        dependencies.removeIf(dependency -> {
+            String nameFrom = dependency.getFrom().split(":")[0];
+            String nameTo = dependency.getTo().split(":")[0];
+            return ignoreSet.contains(nameFrom) || ignoreSet.contains(nameTo);
+        });
     }
 
     @Override
