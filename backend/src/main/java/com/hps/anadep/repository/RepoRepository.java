@@ -11,7 +11,5 @@ import java.util.UUID;
 
 @Repository
 public interface RepoRepository extends JpaRepository<Repo, UUID> {
-    List<Repo> findAllByUser(User user);
-
-    Optional<Repo> findByGithubRepoIdAndUser(Long githubRepoId, User user);
+    Optional<Repo> findByGithubRepoId(Long githubRepoId);
 }

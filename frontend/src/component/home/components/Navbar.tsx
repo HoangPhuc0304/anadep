@@ -15,7 +15,6 @@ import {
 import { GitHubLogoIcon } from '@radix-ui/react-icons'
 import { buttonVariants } from '../../ui/button'
 import { Menu } from 'lucide-react'
-import { ModeToggle } from './mode-toggle'
 import { GiftIcon } from './Icons'
 
 interface RouteProps {
@@ -57,8 +56,6 @@ export const Navbar = () => {
 
                     {/* mobile */}
                     <span className="flex md:hidden">
-                        <ModeToggle />
-
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger className="px-2">
                                 <Menu
@@ -131,8 +128,6 @@ export const Navbar = () => {
                             <GitHubLogoIcon className="mr-2 w-5 h-5" />
                             Github
                         </a>
-
-                        <ModeToggle />
                     </div>
                 </NavigationMenuList>
             </NavigationMenu>

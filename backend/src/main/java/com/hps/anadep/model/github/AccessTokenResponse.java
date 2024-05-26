@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AccessTokenResponse {
     private String accessToken;
+    private long expiresIn;
+    private String refreshToken;
+    private long refreshTokenExpiresIn;
     private String scope;
     private String tokenType;
 }

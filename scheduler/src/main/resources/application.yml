@@ -1,4 +1,3 @@
-
 spring:
   application:
     name: anadep-scheduler
@@ -11,5 +10,17 @@ spring:
         static:
       dynamodb:
         endpoint:
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 server:
   port: 8081
+
+schedule:
+  cron:
+    expression: 0 0 0 * * *
+

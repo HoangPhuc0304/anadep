@@ -11,7 +11,7 @@ public class ScheduleTask {
     @Autowired
     private SchedulerService schedulerService;
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "${schedule.cron.expression}")
     public void start() throws Exception {
         log.info("*** Starting Update ***");
         schedulerService.update();

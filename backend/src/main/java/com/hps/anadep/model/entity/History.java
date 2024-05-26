@@ -30,9 +30,16 @@ public class History {
     @NotEmpty
     private String type;
 
+    @NotEmpty
+    private String path;
+
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "repo_id", referencedColumnName = "id")
     private Repo repo;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 }

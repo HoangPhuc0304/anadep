@@ -9,7 +9,7 @@ aws dynamodb create-table \
         AttributeName=Name,KeyType=HASH \
         AttributeName=Version,KeyType=RANGE \
     --provisioned-throughput \
-        ReadCapacityUnits=25,WriteCapacityUnits=25 \
+        ReadCapacityUnits=1,WriteCapacityUnits=1 \
     --table-class STANDARD
 
 aws dynamodb create-table \
@@ -19,5 +19,5 @@ aws dynamodb create-table \
     --key-schema \
         AttributeName=DatabaseId,KeyType=HASH \
     --provisioned-throughput \
-        ReadCapacityUnits=25,WriteCapacityUnits=25 \
+        ReadCapacityUnits=1,WriteCapacityUnits=1 \
     --table-class STANDARD

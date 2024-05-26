@@ -13,10 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '../../ui/dropdown-menu'
 
-import {
-    generateReport,
-    removeHistoryById,
-} from '../../../api/apiCall'
+import { generateReport, removeHistoryById } from '../../../api/apiCall'
 import { ReportForm, Repository, User } from '../../../model/library'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../../redux/store'
@@ -59,16 +56,12 @@ interface DataTableRowActionsProps<TData> {
 }
 
 const formSchema = z.object({
-    projectName: z
-        .string()
-        .max(100, {
-            message: 'Project name must not be longer than 100 characters.',
-        }),
-    author: z
-        .string()
-        .max(100, {
-            message: 'Author name must not be longer than 100 characters.',
-        }),
+    projectName: z.string().max(100, {
+        message: 'Project name must not be longer than 100 characters.',
+    }),
+    author: z.string().max(100, {
+        message: 'Author name must not be longer than 100 characters.',
+    }),
     format: z.enum(['pdf', 'excel', 'json'], {
         required_error: 'You need to select a format.',
     }),
@@ -85,7 +78,7 @@ export function DataTableRowProjectActions<TData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             projectName: row.original.fullName,
-            author: user.name || user.login,
+            author: user.login,
         },
     })
 

@@ -2,11 +2,13 @@ package com.hps.anadep.controller;
 
 import com.hps.anadep.analyzer.service.UiService;
 import com.hps.anadep.model.Library;
+import com.hps.anadep.model.entity.dto.AuthTokenDto;
 import com.hps.anadep.model.osv.Vulnerability;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.ui.AnalysisUIResult;
 import com.hps.anadep.model.ui.VulnerabilitySummary;
 import com.hps.anadep.security.AppUser;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -105,5 +107,11 @@ public class UiController {
     @ResponseStatus(HttpStatus.OK)
     public VulnerabilitySummary analyze(@RequestBody AnalysisUIResult analysisUIResult) {
         return uiService.summary(analysisUIResult);
+    }
+
+    @PostMapping("/ui/user/token")
+    @ResponseStatus(HttpStatus.OK)
+    public void update(@Valid @RequestBody AuthTokenDto authTokenDto) {
+        uiService.update(authTokenDto);
     }
 }

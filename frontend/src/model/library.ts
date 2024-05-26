@@ -125,12 +125,12 @@ export interface Repository {
     githubUrl: string
     language: string
     scanningResult?: ScanningResult
-    userId?: string
-    updatedBy?: string
+    userIds?: string[]
     createdAt?: string
+    updatedBy?: string
     vulnerabilityResult?: AnalysisUIResult
     vulnerabilitySummary?: VulnerabilitySummary
-    historyId: string
+    historyId?: string
 }
 
 export interface VulnerabilitySummary {
@@ -147,7 +147,9 @@ export interface History {
     scanningResult: ScanningResult
     vulnerabilityResult: AnalysisUIResult
     type: string
+    path: string
     createdAt: string
+    updatedBy?: string
     repoId: string
 }
 
@@ -163,4 +165,8 @@ export interface FixResult {
     libs: LibraryFix[]
     ecosystem: string
     responseTime: number
+}
+
+export interface Setting {
+    anadepEnable: boolean
 }

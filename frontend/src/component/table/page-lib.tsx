@@ -73,7 +73,11 @@ export default function SbomPage({
         if (file) {
             let data = ''
             if (repo && repo.id && user.githubToken) {
-                data = await getAuthScanUIResult(file, repo.id, user.githubToken)
+                data = await getAuthScanUIResult(
+                    file,
+                    repo.id,
+                    user.githubToken
+                )
             } else {
                 data = await getScanUIResult(file)
             }

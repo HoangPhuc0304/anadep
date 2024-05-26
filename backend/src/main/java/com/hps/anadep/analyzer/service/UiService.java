@@ -1,6 +1,7 @@
 package com.hps.anadep.analyzer.service;
 
 import com.hps.anadep.model.Library;
+import com.hps.anadep.model.entity.dto.AuthTokenDto;
 import com.hps.anadep.model.osv.Vulnerability;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.ui.AnalysisUIResult;
@@ -21,4 +22,5 @@ public interface UiService {
     Vulnerability getVulnById(String id);
     Vulnerability getVulnByIdV2(String id);
     VulnerabilitySummary summary(AnalysisUIResult analysisUIResult);
+    void update(AuthTokenDto authTokenDto);
 }

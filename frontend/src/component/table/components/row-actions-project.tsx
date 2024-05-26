@@ -19,11 +19,7 @@ import {
     getAuthAnalysisUIResult,
     removeRepoById,
 } from '../../../api/apiCall'
-import {
-    ReportForm,
-    Repository,
-    User,
-} from '../../../model/library'
+import { ReportForm, Repository, User } from '../../../model/library'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../redux/store'
 import { ToastAction } from '../../../component/ui/toast'
@@ -67,16 +63,12 @@ interface DataTableRowActionsProps<TData> {
 }
 
 const formSchema = z.object({
-    projectName: z
-        .string()
-        .max(100, {
-            message: 'Project name must not be longer than 100 characters.',
-        }),
-    author: z
-        .string()
-        .max(100, {
-            message: 'Author name must not be longer than 100 characters.',
-        }),
+    projectName: z.string().max(100, {
+        message: 'Project name must not be longer than 100 characters.',
+    }),
+    author: z.string().max(100, {
+        message: 'Author name must not be longer than 100 characters.',
+    }),
     type: z.enum(['vulns', 'sbom'], {
         required_error: 'You need to select a type.',
     }),
@@ -97,7 +89,7 @@ export function DataTableRowProjectActions<TData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             projectName: row.original.fullName,
-            author: user.name || user.login,
+            author: user.login,
         },
     })
 
@@ -131,7 +123,11 @@ export function DataTableRowProjectActions<TData>({
             const blob = new Blob([downloadData], { type: 'application/zip' })
             const file = new File([blob], 'source.zip')
             if (file && row.original.id) {
-                const analysisData = await getAuthAnalysisUIResult(file, row.original.id, user.githubToken)
+                const analysisData = await getAuthAnalysisUIResult(
+                    file,
+                    row.original.id,
+                    user.githubToken
+                )
                 if (typeof analysisData === 'string') {
                     handlingToastAction(
                         ERROR_LABEL,

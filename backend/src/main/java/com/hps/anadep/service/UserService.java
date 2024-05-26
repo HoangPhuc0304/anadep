@@ -2,7 +2,6 @@ package com.hps.anadep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hps.anadep.model.entity.User;
-import com.hps.anadep.model.entity.dto.AuthTokenDto;
 import com.hps.anadep.model.entity.dto.HistoryDto;
 import com.hps.anadep.model.entity.dto.RepoDto;
 import com.hps.anadep.model.response.ScanningResult;
@@ -15,7 +14,6 @@ import java.util.UUID;
 public interface UserService {
     User save(User user);
     RepoDto save(RepoDto repoDto, AppUser appUser);
-    void update(AuthTokenDto authTokenDto);
     void update(String repoId, ScanningResult scanningResult, AppUser appUser) throws JsonProcessingException;
     void update(String repoId, AnalysisUIResult analysisUIResult, AppUser appUser) throws JsonProcessingException;
     void delete(String repoId, AppUser appUser);

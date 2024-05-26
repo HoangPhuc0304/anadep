@@ -53,10 +53,10 @@ export default function VulnerabilityPage({
         () =>
             loading
                 ? columns.map((column) => ({
-                    ...column,
-                    accessorFn: () => '',
-                    cell: () => <Skeleton className="h-[40px] w-full" />,
-                }))
+                      ...column,
+                      accessorFn: () => '',
+                      cell: () => <Skeleton className="h-[40px] w-full" />,
+                  }))
                 : columns,
         [loading, columns]
     )
@@ -73,7 +73,11 @@ export default function VulnerabilityPage({
         if (file) {
             let data = ''
             if (repo && repo.id && user.githubToken) {
-                data = await getAuthAnalysisUIResult(file, repo.id, user.githubToken)
+                data = await getAuthAnalysisUIResult(
+                    file,
+                    repo.id,
+                    user.githubToken
+                )
             } else {
                 data = await getAnalysisUIResult(file)
             }
@@ -153,29 +157,16 @@ export default function VulnerabilityPage({
     return (
         <div className="mx-auto">
             <ScrollArea className="h-[640px] w-full px-4">
-                {loading ? (
-                    <DataTable
-                        data={analysisUIResult.libs}
-                        columns={loadingColumns}
-                        input={{ column: 'packageName', title: 'Package Name' }}
-                        filter={{
-                            column: 'severity',
-                            title: 'Severity',
-                            dataset: severities,
-                        }}
-                    />
-                ) : (
-                    <DataTable
-                        data={analysisUIResult.libs}
-                        columns={columns}
-                        input={{ column: 'packageName', title: 'Package Name' }}
-                        filter={{
-                            column: 'severity',
-                            title: 'Severity',
-                            dataset: severities,
-                        }}
-                    />
-                )}
+                <DataTable
+                    data={analysisUIResult.libs}
+                    columns={loadingColumns}
+                    input={{ column: 'packageName', title: 'Package Name' }}
+                    filter={{
+                        column: 'severity',
+                        title: 'Severity',
+                        dataset: severities,
+                    }}
+                />
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
         </div>

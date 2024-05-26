@@ -3,6 +3,7 @@ package com.hps.anadep.scanner.service.impl;
 import com.hps.anadep.model.enums.Compress;
 import com.hps.anadep.model.enums.Ecosystem;
 import com.hps.anadep.model.response.ScanningResult;
+import com.hps.anadep.model.util.Namespace;
 import com.hps.anadep.scanner.service.FileService;
 import com.hps.anadep.scanner.service.ScannerService;
 import com.hps.anadep.scanner.util.CommonTool;
@@ -40,7 +41,8 @@ public class ScannerServiceImpl implements ScannerService {
             PackageManagementTool packageManagementTool = applicationContext.getBean(CommonTool.class);
             try {
                 fileService.save(file, filename, namespace);
-                return packageManagementTool.getDependencies(includeTransitive, String.join("/", namespace, folderName));
+                Namespace space = new Namespace(String.join("/", namespace, folderName), null, null);
+                return packageManagementTool.getDependencies(includeTransitive, space);
             } finally {
                 fileService.clean(String.join("/", SCANNER_DIR, namespace));
             }
@@ -57,63 +59,11 @@ public class ScannerServiceImpl implements ScannerService {
             }
             try {
                 fileService.save(file, ecosystem.getPackageManagementFile(), namespace);
-                return packageManagementTool.getDependencies(includeTransitive, namespace);
+                Namespace space = new Namespace(namespace, null, null);
+                return packageManagementTool.getDependencies(includeTransitive, space);
             } finally {
                 fileService.clean(String.join("/", SCANNER_DIR, namespace));
             }
         }
     }
-
-//    @Override
-//    public Map<Library, String> scanToMap(MultipartFile file) throws Exception {
-//        String filename = file.getOriginalFilename();
-//        if (!StringUtils.hasText(filename)) {
-//            return null;
-//        }
-//        String extension = filename.substring(filename.lastIndexOf('.') + 1);
-//        String folderName = filename.substring(0, filename.lastIndexOf("."));
-//        if (extension.equals(Compress.ZIP.getName())) {
-//            String namespace = Compress.ZIP.getName() + "-" + Instant.now().toEpochMilli();
-//            PackageManagementTool packageManagementTool = applicationContext.getBean(CommonTool.class);
-//            try {
-//                fileService.save(file, filename, namespace);
-//                Map<Library, String> map = packageManagementTool.getDependencyMap(String.join("/", namespace, folderName));
-//                return map;
-//            } finally {
-//                fileService.clean(String.join("/", SCANNER_DIR, namespace));
-//            }
-//        } else {
-//            Ecosystem ecosystem = Ecosystem.getEcosystemFromPackageManagementFile(filename);
-//            PackageManagementTool packageManagementTool;
-//            String namespace = ecosystem.getOsvName() + "-" + Instant.now().toEpochMilli();
-//            switch (ecosystem) {
-//                case MAVEN -> packageManagementTool = applicationContext.getBean(MavenTool.class);
-//                case NPM -> packageManagementTool = applicationContext.getBean(NpmTool.class);
-//                default -> {
-//                    return Collections.emptyMap();
-//                }
-//            }
-//            try {
-//                fileService.save(file, ecosystem.getPackageManagementFile(), namespace);
-//                Map<Library, String> map = packageManagementTool.getDependencyMap(String.join("/", namespace, folderName));
-//                return map;
-//            } finally {
-//                fileService.clean(String.join("/", SCANNER_DIR, namespace));
-//            }
-//        }
-//    }
-
-//    @Override
-//    public boolean isUseLibrary(Map.Entry<Library, String> entry, Library lib) throws JsonProcessingException {
-//        Ecosystem ecosystem = Ecosystem.getEcosystem(lib.getEcosystem());
-//        PackageManagementTool packageManagementTool;
-//        switch (ecosystem) {
-//            case MAVEN -> packageManagementTool = applicationContext.getBean(MavenTool.class);
-//            case NPM -> packageManagementTool = applicationContext.getBean(NpmTool.class);
-//            default -> {
-//                return false;
-//            }
-//        }
-//        return packageManagementTool.isUseLibrary(entry, lib);
-//    }
 }

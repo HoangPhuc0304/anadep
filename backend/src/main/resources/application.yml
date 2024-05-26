@@ -39,6 +39,16 @@ spring:
       name:
       password:
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 github:
   client-id:
   client-secret:
+
+anadep:
+  db:
+    enable: false

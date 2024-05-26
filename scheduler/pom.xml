@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.hps</groupId>
 	<artifactId>anadep-scheduler</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>scheduler</name>
 	<description>scheduler</description>
 	<properties>
@@ -19,6 +19,7 @@
 		<spring-cloud-aws.version>3.1.1</spring-cloud-aws.version>
 		<semver.version>3.1.0</semver.version>
 		<zip4j.version>1.3.2</zip4j.version>
+		<maven.version>3.6.3</maven.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -38,6 +39,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.awspring.cloud</groupId>
@@ -62,7 +67,7 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-artifact</artifactId>
-			<version>3.6.3</version>
+			<version>${maven.version}</version>
 		</dependency>
 	</dependencies>
 

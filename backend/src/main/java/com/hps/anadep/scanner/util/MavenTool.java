@@ -10,6 +10,7 @@ import com.hps.anadep.model.enums.Ecosystem;
 import com.hps.anadep.model.enums.Resolution;
 import com.hps.anadep.model.response.ScanningResult;
 import com.hps.anadep.model.response.SummaryFix;
+import com.hps.anadep.model.util.Namespace;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.DependencyManagement;
@@ -18,6 +19,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
@@ -42,9 +44,9 @@ public class MavenTool implements PackageManagementTool {
     private static final String DEPENDENCY_NAME_FORMAT = "%s:%s";
 
     @Override
-    public ScanningResult getDependencies(boolean includeTransitive, String namespace) throws Exception {
-        String storagePackageDir = String.join("/", SCANNER_DIR, namespace);
-        String storageText = String.join("/", SCANNER_DIR, namespace, STORAGE_JSON_FILE_NAME);
+    public ScanningResult getDependencies(boolean includeTransitive, Namespace namespace) throws Exception {
+        String storagePackageDir = String.join("/", SCANNER_DIR, namespace.getPath());
+        String storageJson = String.join("/", SCANNER_DIR, namespace.getPath(), STORAGE_JSON_FILE_NAME);
         Set<Library> libraries = new HashSet<>();
 
         processing(storagePackageDir, STORAGE_JSON_FILE_NAME);
@@ -59,8 +61,12 @@ public class MavenTool implements PackageManagementTool {
         String packagingType = model.getPackaging();
 
         String id = String.format(MAVEN_FORMAT_ID, groupId, artifactId, packagingType);
-        Depgraph depgraph = objectMapper.readValue(new File(storageText), Depgraph.class);
+        Depgraph depgraph = objectMapper.readValue(new File(storageJson), Depgraph.class);
         refactor(depgraph, id);
+        if (!CollectionUtils.isEmpty(namespace.getIgnore())) {
+            updateIgnoreDependencies(depgraph, namespace.getIgnore());
+        }
+
         List<Artifact> artifacts = depgraph.getArtifacts();
 
         if (!includeTransitive) {
@@ -83,9 +89,35 @@ public class MavenTool implements PackageManagementTool {
                 .dependencies(Set.copyOf(depgraph.getDependencies()))
                 .projectName(depgraph.getGraphName())
                 .ecosystem(Ecosystem.MAVEN.getOsvName())
+                .path(namespace.getManifestFilePath())
                 .libraryCount(libraries.size())
                 .includeTransitive(includeTransitive)
                 .build();
+    }
+
+    private void updateIgnoreDependencies(Depgraph depgraph, List<String> ignore) {
+        Set<String> ignoreSet = ignore.stream().map(dependency -> {
+            String groupId = dependency.split(":")[0];
+            String artifactId = dependency.split(":")[1];
+            return DEPENDENCY_NAME_FORMAT.formatted(groupId, artifactId);
+        }).collect(Collectors.toSet());
+
+        depgraph.setArtifacts(depgraph.getArtifacts().stream().filter(artifact -> {
+            String name = DEPENDENCY_NAME_FORMAT.formatted(artifact.getGroupId(), artifact.getArtifactId());
+            return !ignoreSet.contains(name);
+        }).toList());
+
+        depgraph.setDependencies(depgraph.getDependencies().stream().filter(dependency -> {
+            String nameFrom = DEPENDENCY_NAME_FORMAT.formatted(
+                    dependency.getFrom().split(":")[0],
+                    dependency.getFrom().split(":")[1]
+            );
+            String nameTo = DEPENDENCY_NAME_FORMAT.formatted(
+                    dependency.getTo().split(":")[0],
+                    dependency.getTo().split(":")[1]
+            );
+            return !ignoreSet.contains(nameFrom) && !ignoreSet.contains(nameTo);
+        }).toList());
     }
 
     @Override

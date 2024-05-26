@@ -35,7 +35,7 @@ public class RepoDto {
 
     private ScanningResult scanningResult = new ScanningResult();
 
-    private UUID userId;
+    private Set<UUID> userIds = new HashSet<>();
 
     private AnalysisUIResult vulnerabilityResult = new AnalysisUIResult();
 }

@@ -26,10 +26,12 @@ import com.hps.anadep.service.GitHubService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AppServiceImpl implements AppService {
@@ -91,6 +93,7 @@ public class AppServiceImpl implements AppService {
         long scanningTime = System.currentTimeMillis() - start;
 
         history.setScanningResult(objectMapper.writeValueAsString(scanningResult));
+        history.setPath(scanningResult.getPath());
 
         AnalysisResult analysisResult = analyzerService.analyze(scanningResult.getLibraries(), includeSafe);
         analysisResult.setResponseTime(analysisResult.getResponseTime() + scanningTime);
@@ -114,6 +117,7 @@ public class AppServiceImpl implements AppService {
         long scanningTime = System.currentTimeMillis() - start;
 
         history.setScanningResult(objectMapper.writeValueAsString(scanningResult));
+        history.setPath(scanningResult.getPath());
 
         AnalysisResult analysisResult = analyzerService.analyzeV2(scanningResult.getLibraries(), includeSafe);
         analysisResult.setResponseTime(analysisResult.getResponseTime() + scanningTime);
@@ -169,7 +173,7 @@ public class AppServiceImpl implements AppService {
     public SummaryFix applyFix(String repoId, String historyId, AppUser appUser) throws IOException {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new NotFoundException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
         History history = historyRepository.findByIdAndRepo(UUID.fromString(historyId), repo).orElseThrow(
                 () -> new NotFoundException(String.format("The history with id [%s] doesn't exist", historyId)));
         AnalysisUIResult analysisUIResult;
@@ -195,7 +199,7 @@ public class AppServiceImpl implements AppService {
     public void advisory(String repoId, String historyId, AppUser appUser) {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
         History history = historyRepository.findByIdAndRepo(UUID.fromString(historyId), repo).orElseThrow(
                 () -> new RuntimeException(String.format("The history with id [%s] doesn't exist", historyId)));
         try {
@@ -211,7 +215,7 @@ public class AppServiceImpl implements AppService {
     public void advisoryV2(String repoId, String historyId, AppUser appUser) {
         Repo repo = repoRepository.findById(UUID.fromString(repoId)).orElseThrow(
                 () -> new RuntimeException(String.format("The repo with id [%s] doesn't exist", repoId)));
-        validateUserId(repo.getUser().getId(), appUser);
+        validateUserId(repo.getUsers().stream().map(User::getId).collect(Collectors.toSet()), appUser);
         History history = historyRepository.findByIdAndRepo(UUID.fromString(historyId), repo).orElseThrow(
                 () -> new RuntimeException(String.format("The history with id [%s] doesn't exist", historyId)));
         try {
@@ -227,8 +231,8 @@ public class AppServiceImpl implements AppService {
         return evaluateService.autoFix(analysisUIResult);
     }
 
-    private void validateUserId(UUID id, AppUser appUser) {
-        if (!appUser.getId().equals(id)) {
+    private void validateUserId(Set<UUID> ids, AppUser appUser) {
+        if (CollectionUtils.isEmpty(ids) || !ids.contains(appUser.getId())) {
             throw new RuntimeException("Authorize failed");
         }
     }

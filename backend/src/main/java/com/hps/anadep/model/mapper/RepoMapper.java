@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hps.anadep.model.entity.History;
 import com.hps.anadep.model.entity.Repo;
+import com.hps.anadep.model.entity.User;
 import com.hps.anadep.model.entity.dto.RepoDto;
 import com.hps.anadep.model.enums.ReportType;
 import com.hps.anadep.model.response.ScanningResult;
@@ -16,6 +17,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public abstract class RepoMapper {
@@ -23,7 +27,7 @@ public abstract class RepoMapper {
     private HistoryRepository historyRepository;
 
     @Mapping(target = "scanningResult", expression = "java(getScanningResult(repo))")
-    @Mapping(target = "userId", source = "repo.user.id")
+    @Mapping(target = "userIds", expression = "java(getUserIds(repo))")
     @Mapping(target = "vulnerabilityResult", expression = "java(getVulnerabilityResult(repo))")
     public abstract RepoDto mapToDto(Repo repo);
 
@@ -53,5 +57,9 @@ public abstract class RepoMapper {
             }
         }
         return new AnalysisUIResult();
+    }
+
+    Set<UUID> getUserIds(Repo repo) {
+        return repo.getUsers().stream().map(User::getId).collect(Collectors.toSet());
     }
 }

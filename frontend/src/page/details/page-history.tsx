@@ -4,6 +4,7 @@ import {
     AlertCircle,
     Archive,
     Boxes,
+    BugOff,
     GitPullRequestArrow,
     MessagesSquare,
     Search,
@@ -92,7 +93,7 @@ export function HistoryDetails() {
     const [history, setHistory] = React.useState<History>()
     const { repoId, id } = useParams()
     const [searchParams, setSearchParams] = useSearchParams()
-    const fixAvailable = searchParams.get('fixAvailable');
+    const fixAvailable = searchParams.get('fixAvailable')
 
     const user: User = useSelector((state: RootState) => state.user.currentUser)
 
@@ -160,7 +161,7 @@ export function HistoryDetails() {
                         sizes
                     )}`
                 }}
-                className="h-full min-h-[800px] max-h-[800px] items-stretch"
+                className="h-full items-stretch"
             >
                 <ResizablePanel
                     defaultSize={defaultLayout[0]}
@@ -179,10 +180,7 @@ export function HistoryDetails() {
                             isCollapsed ? 'h-[52px]' : 'px-2'
                         )}
                     >
-                        <AccountSwitcher
-                            isCollapsed={isCollapsed}
-                            accounts={accounts}
-                        />
+                        <BugOff />
                     </div>
                     <Separator />
                     <Nav
@@ -195,7 +193,7 @@ export function HistoryDetails() {
                                 variant: 'ghost',
                             },
                             {
-                                title: 'Vulnerability',
+                                title: 'SCA',
                                 href: '/namespace',
                                 icon: ShieldCheck,
                                 variant: 'ghost',
@@ -211,42 +209,6 @@ export function HistoryDetails() {
                                 href: '/project',
                                 icon: GitPullRequestArrow,
                                 variant: 'default',
-                            },
-                        ]}
-                    />
-                    <Separator />
-                    <Nav
-                        isCollapsed={isCollapsed}
-                        links={[
-                            {
-                                title: 'Social',
-                                label: '972',
-                                icon: Users2,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Updates',
-                                label: '342',
-                                icon: AlertCircle,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Forums',
-                                label: '128',
-                                icon: MessagesSquare,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Shopping',
-                                label: '8',
-                                icon: ShoppingCart,
-                                variant: 'ghost',
-                            },
-                            {
-                                title: 'Promotions',
-                                label: '21',
-                                icon: Archive,
-                                variant: 'ghost',
                             },
                         ]}
                     />
@@ -293,7 +255,11 @@ export function HistoryDetails() {
                         </div>
                     </Tabs>
                     {history?.type.toLocaleLowerCase() === 'vulns' ? (
-                        <HistoryVulnsPage repo={repo} history={history} fixAvailable={fixAvailable}/>
+                        <HistoryVulnsPage
+                            repo={repo}
+                            history={history}
+                            fixAvailable={fixAvailable}
+                        />
                     ) : (
                         <HistorySbomPage repo={repo} history={history} />
                     )}

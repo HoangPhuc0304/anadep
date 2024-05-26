@@ -1,0 +1,97 @@
+name: "Build"
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1
+  ANADEP_BACKEND_ECR_REPOSITORY: anadep-backend
+  ANADEP_FRONTEND_ECR_REPOSITORY: anadep-frontend
+  ANADEP_SCHEDULER_ECR_REPOSITORY: anadep-scheduler
+  REACT_APP_BASE_URL: https://backend.anadep.com
+  REACT_APP_AUTH_CLIENT_ID: Iv1.e42995fe135712e5
+  REACT_APP_ENABLE_ANADEP_DB: true
+  REACT_APP_AUTH_GITHUB_APP: https://github.com/apps/anadep-auth-app
+  DEV_TOOLS: false
+
+permissions:
+  contents: read
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Get Docker Tag
+        id: docker-tag
+        run: |
+          anadep_backend_version=$(grep "LABEL version=" backend/Dockerfile | head | sed 's/LABEL version=//g' | tr -d '\t')
+          anadep_frontend_version=$(grep "LABEL version=" frontend/Dockerfile | head | sed 's/LABEL version=//g' | tr -d '\t')
+          anadep_scheduler_version=$(grep "LABEL version=" scheduler/Dockerfile | head | sed 's/LABEL version=//g' | tr -d '\t')
+          echo "anadep_backend_version=$anadep_backend_version" >> $GITHUB_OUTPUT
+          echo "anadep_frontend_version=$anadep_frontend_version" >> $GITHUB_OUTPUT
+          echo "anadep_scheduler_version=$anadep_scheduler_version" >> $GITHUB_OUTPUT
+
+      - name: Build anadep-backend artifact with Maven
+        run: mvn clean install -B --file backend/pom.xml
+
+      - name: Build, tag, and push anadep-backend image to Amazon ECR
+        id: build-anadep-backend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.anadep_backend_version }}
+        run: |
+          docker build -f backend/Dockerfile -t $ECR_REGISTRY/$ANADEP_BACKEND_ECR_REPOSITORY:$IMAGE_TAG ./backend/
+          docker push $ECR_REGISTRY/$ANADEP_BACKEND_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ANADEP_BACKEND_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push anadep-frontend image to Amazon ECR
+        id: build-anadep-frontend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.anadep_frontend_version }}
+          REACT_APP_BASE_URL: ${{ env.REACT_APP_BASE_URL }}
+          REACT_APP_AUTH_CLIENT_ID: ${{ env.REACT_APP_AUTH_CLIENT_ID }}
+          REACT_APP_ENABLE_ANADEP_DB: ${{ env.REACT_APP_ENABLE_ANADEP_DB }}
+          DEV_TOOLS: ${{ env.DEV_TOOLS }}
+        run: |
+          docker build -f frontend/Dockerfile -t $ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG --build-arg REACT_APP_BASE_URL=$REACT_APP_BASE_URL --build-arg REACT_APP_AUTH_CLIENT_ID=$REACT_APP_AUTH_CLIENT_ID --build-arg REACT_APP_ENABLE_ANADEP_DB=$REACT_APP_ENABLE_ANADEP_DB --build-arg DEV_TOOLS=$DEV_TOOLS ./frontend/
+          docker push $ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ANADEP_FRONTEND_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build anadep-scheduler artifact with Maven
+        run: mvn clean install -B --file scheduler/pom.xml
+
+      - name: Build, tag, and push anadep-scheduler image to Amazon ECR
+        id: build-anadep-scheduler
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.anadep_scheduler_version }}
+        run: |
+          docker build -f scheduler/Dockerfile -t $ECR_REGISTRY/$ANADEP_SCHEDULER_ECR_REPOSITORY:$IMAGE_TAG ./scheduler/
+          docker push $ECR_REGISTRY/$ANADEP_SCHEDULER_ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ANADEP_SCHEDULER_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
