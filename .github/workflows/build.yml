@@ -12,6 +12,7 @@ env:
   REACT_APP_BASE_URL: https://backend.anadep.com
   REACT_APP_AUTH_CLIENT_ID: Iv1.e42995fe135712e5
   REACT_APP_ENABLE_ANADEP_DB: true
+  REACT_APP_AUTH_GITHUB_APP: https://github.com/apps/anadep-auth-app
   DEV_TOOLS: false
 
 permissions:
