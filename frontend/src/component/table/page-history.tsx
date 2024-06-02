@@ -148,7 +148,7 @@ export default function HistoryPage({
                     <TabsTrigger value="sbom">SBOM</TabsTrigger>
                 </TabsList>
                 <TabsContent value="vulns">
-                    <ScrollArea className="h-[640px] w-full px-4">
+                    <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 236px)"}}>
                         {vulnsLoading ? (
                             <DataTable
                                 data={vulnsHistories}
@@ -174,7 +174,7 @@ export default function HistoryPage({
                     </ScrollArea>
                 </TabsContent>
                 <TabsContent value="sbom">
-                    <ScrollArea className="h-[640px] w-full px-4">
+                    <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 236px)"}}>
                         {sbomLoading ? (
                             <DataTable
                                 data={sbomHistories}

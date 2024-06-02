@@ -57,6 +57,7 @@ import { RadioGroup, RadioGroupItem } from '../../../component/ui/radio-group'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ScrollArea } from '../../../component/ui/scroll-area'
 
 interface DataTableRowActionsProps<TData> {
     row: Row<Repository>
@@ -227,146 +228,148 @@ export function DataTableRowProjectActions<TData>({
                 </DropdownMenuContent>
             </DropdownMenu>
             <DialogContent className="sm:max-w-[425px]">
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(handlingSubmit)}
-                        className="space-y-8"
-                    >
-                        <DialogHeader>
-                            <DialogTitle>Export scan data</DialogTitle>
-                            <DialogDescription>
-                                Please provide project information and format of
-                                data you like to export
-                            </DialogDescription>
-                        </DialogHeader>
-                        <FormField
-                            control={form.control}
-                            name="projectName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Project Name</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Your project name"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        This is the project name that will be
-                                        displayed on your report.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="author"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Author</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Author name"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        This is the author name that will be
-                                        displayed on your report.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="type"
-                            render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                    <FormLabel>Please choose a type</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            className="flex flex-col space-y-1"
-                                        >
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="vulns" />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    Vulnerability
-                                                </FormLabel>
-                                            </FormItem>
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="sbom" />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    SBOM
-                                                </FormLabel>
-                                            </FormItem>
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="format"
-                            render={({ field }) => (
-                                <FormItem className="space-y-3">
-                                    <FormLabel>
-                                        Please choose a format
-                                    </FormLabel>
-                                    <FormControl>
-                                        <RadioGroup
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                            className="flex flex-col space-y-1"
-                                        >
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="pdf" />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    PDF
-                                                </FormLabel>
-                                            </FormItem>
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="excel" />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    EXCEL
-                                                </FormLabel>
-                                            </FormItem>
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                                <FormControl>
-                                                    <RadioGroupItem value="json" />
-                                                </FormControl>
-                                                <FormLabel className="font-normal">
-                                                    JSON
-                                                </FormLabel>
-                                            </FormItem>
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="secondary">
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-                            <Button type="submit">Export</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
+                <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 200px)"}}>
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(handlingSubmit)}
+                            className="space-y-8"
+                        >
+                            <DialogHeader>
+                                <DialogTitle>Export scan data</DialogTitle>
+                                <DialogDescription>
+                                    Please provide project information and format of
+                                    data you like to export
+                                </DialogDescription>
+                            </DialogHeader>
+                            <FormField
+                                control={form.control}
+                                name="projectName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Project Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Your project name"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            This is the project name that will be
+                                            displayed on your report.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="author"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel>Author</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Author name"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            This is the author name that will be
+                                            displayed on your report.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="type"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                        <FormLabel>Please choose a type</FormLabel>
+                                        <FormControl>
+                                            <RadioGroup
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                                className="flex flex-col space-y-1"
+                                            >
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="vulns" />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        Vulnerability
+                                                    </FormLabel>
+                                                </FormItem>
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="sbom" />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        SBOM
+                                                    </FormLabel>
+                                                </FormItem>
+                                            </RadioGroup>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="format"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                        <FormLabel>
+                                            Please choose a format
+                                        </FormLabel>
+                                        <FormControl>
+                                            <RadioGroup
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                                className="flex flex-col space-y-1"
+                                            >
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="pdf" />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        PDF
+                                                    </FormLabel>
+                                                </FormItem>
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="excel" />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        EXCEL
+                                                    </FormLabel>
+                                                </FormItem>
+                                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                                    <FormControl>
+                                                        <RadioGroupItem value="json" />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">
+                                                        JSON
+                                                    </FormLabel>
+                                                </FormItem>
+                                            </RadioGroup>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant="secondary">
+                                        Cancel
+                                    </Button>
+                                </DialogClose>
+                                <Button type="submit">Export</Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     )
