@@ -1,0 +1,118 @@
+{
+    "libs": [
+        {
+            "name": "net.minidev:json-smart",
+            "currentVersion": "2.4.8",
+            "fixedVersion": "2.4.9",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.springframework:spring-webmvc",
+            "currentVersion": "6.0.4",
+            "fixedVersion": "6.0.14",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.springframework.boot:spring-boot",
+            "currentVersion": "3.0.2",
+            "fixedVersion": "3.0.13",
+            "severity": "Medium",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.springframework.security:spring-security-core",
+            "currentVersion": "6.0.1",
+            "fixedVersion": "6.1.8",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "com.nimbusds:nimbus-jose-jwt",
+            "currentVersion": "9.24.4",
+            "fixedVersion": "9.37.2",
+            "severity": null,
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "ch.qos.logback:logback-classic",
+            "currentVersion": "1.4.5",
+            "fixedVersion": "1.4.12",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.apache.tomcat.embed:tomcat-embed-core",
+            "currentVersion": "10.1.5",
+            "fixedVersion": "10.1.19",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.springframework:spring-web",
+            "currentVersion": "6.0.4",
+            "fixedVersion": "6.0.19",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.springframework.security:spring-security-config",
+            "currentVersion": "6.0.1",
+            "fixedVersion": "6.0.5",
+            "severity": "Critical",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.springframework.boot:spring-boot-autoconfigure",
+            "currentVersion": "3.0.2",
+            "fixedVersion": "3.0.7",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.xmlunit:xmlunit-core",
+            "currentVersion": "2.9.1",
+            "fixedVersion": "2.10.0",
+            "severity": null,
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.apache.tomcat.embed:tomcat-embed-websocket",
+            "currentVersion": "10.1.5",
+            "fixedVersion": "10.1.19",
+            "severity": null,
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "com.jayway.jsonpath:json-path",
+            "currentVersion": "2.7.0",
+            "fixedVersion": "2.9.0",
+            "severity": "Medium",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "ch.qos.logback:logback-core",
+            "currentVersion": "1.4.5",
+            "fixedVersion": "1.4.12",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.yaml:snakeyaml",
+            "currentVersion": "1.33",
+            "fixedVersion": "2.0",
+            "severity": "High",
+            "ecosystem": "Maven"
+        },
+        {
+            "name": "org.springframework:spring-expression",
+            "currentVersion": "6.0.4",
+            "fixedVersion": "6.0.8",
+            "severity": "High",
+            "ecosystem": "Maven"
+        }
+    ],
+    "ecosystem": "Maven",
+    "responseTime": 1424
+}
