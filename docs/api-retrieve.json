@@ -1,0 +1,184 @@
+{
+    "libs": [
+        {
+            "info": {
+                "name": "org.apache.tomcat.embed:tomcat-embed-core",
+                "version": "10.1.14",
+                "ecosystem": "Maven"
+            },
+            "vulns": [
+                {
+                    "id": "GHSA-7w75-32cg-r6g2",
+                    "summary": "Apache Tomcat Denial of Service due to improper input validation vulnerability for HTTP/2 requests",
+                    "details": "Denial of Service due to improper input validation vulnerability for HTTP/2 requests in Apache Tomcat. When processing an HTTP/2 request, if the request exceeded any of the configured limits for headers, the associated HTTP/2 stream was not reset until after all of the headers had been processed.This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.0-M16, from 10.1.0-M1 through 10.1.18, from 9.0.0-M1 through 9.0.85, from 8.5.0 through 8.5.98.\n\nUsers are recommended to upgrade to version 11.0.0-M17, 10.1.19, 9.0.86 or 8.5.99 which fix the issue.\n\n",
+                    "aliases": [
+                        "BIT-tomcat-2024-24549",
+                        "CVE-2024-24549"
+                    ],
+                    "modified": "2024-06-25T02:30:05.155818Z",
+                    "published": "2024-03-13T18:31:34Z",
+                    "references": [
+                        {
+                            "type": "ADVISORY",
+                            "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-24549"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/0cac540a882220231ba7a82330483cbd5f6b1f96"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/810f49d5ff6d64b704af85d5b8d0aab9ec3c83f5"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/8e03be9f2698f2da9027d40b9e9c0c9429b74dc0"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/d07c82194edb69d99b438828fe2cbfadbb207843"
+                        },
+                        {
+                            "type": "PACKAGE",
+                            "url": "https://github.com/apache/tomcat"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://lists.apache.org/thread/4c50rmomhbbsdgfjsgwlb51xdwfjdcvg"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://lists.debian.org/debian-lts-announce/2024/04/msg00001.html"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/3UWIS5MMGYDZBLJYT674ZI5AWFHDZ46B"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/736G4GPZWS2DSQO5WKXO3G6OMZKFEK55"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://security.netapp.com/advisory/ntap-20240402-0002"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "http://www.openwall.com/lists/oss-security/2024/03/13/3"
+                        }
+                    ],
+                    "severity": [],
+                    "fixed": "10.1.19",
+                    "database_specific": {
+                        "severity": "MODERATE",
+                        "github_reviewed_at": "2024-03-15T16:27:53Z",
+                        "github_reviewed": true,
+                        "cwe_ids": [
+                            "CWE-20"
+                        ],
+                        "nvd_published_at": "2024-03-13T16:15:29Z"
+                    },
+                    "schema_version": "1.6.0"
+                },
+                {
+                    "id": "GHSA-fccv-jmmp-qg76",
+                    "summary": "Apache Tomcat Improper Input Validation vulnerability",
+                    "details": "Improper Input Validation vulnerability in Apache Tomcat. Tomcat from 11.0.0-M1 through 11.0.0-M10, from 10.1.0-M1 through 10.1.15, from 9.0.0-M1 through 9.0.82, and from 8.5.0 through 8.5.95 did not correctly parse HTTP trailer headers. A trailer header that exceeded the header size limit could cause Tomcat to treat a single request as multiple requests leading to the possibility of request smuggling when behind a reverse proxy.\n\nUsers are recommended to upgrade to version 11.0.0-M11 onwards, 10.1.16 onwards, 9.0.83 onwards or 8.5.96 onwards, which fix the issue.",
+                    "aliases": [
+                        "BIT-tomcat-2023-46589",
+                        "CVE-2023-46589"
+                    ],
+                    "modified": "2024-02-20T05:26:18.936452Z",
+                    "published": "2023-11-28T18:30:23Z",
+                    "references": [
+                        {
+                            "type": "ADVISORY",
+                            "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-46589"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/6f181e1062a472bc5f0234980f66cbde42c1041b"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/7a2d8818fcea0b51747a67af9510ce7977245ebd"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/aa92971e879a519384c517febc39fd04c48d4642"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://github.com/apache/tomcat/commit/b5776d769bffeade865061bc8ecbeb2b56167b08"
+                        },
+                        {
+                            "type": "PACKAGE",
+                            "url": "https://github.com/apache/tomcat"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://lists.apache.org/thread/0rqq6ktozqc42ro8hhxdmmdjm1k1tpxr"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://lists.debian.org/debian-lts-announce/2024/01/msg00001.html"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://security.netapp.com/advisory/ntap-20231214-0009"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://tomcat.apache.org/security-10.html"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://tomcat.apache.org/security-11.html"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://tomcat.apache.org/security-8.html"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://tomcat.apache.org/security-9.html"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "https://www.openwall.com/lists/oss-security/2023/11/28/2"
+                        },
+                        {
+                            "type": "WEB",
+                            "url": "http://www.openwall.com/lists/oss-security/2023/11/28/2"
+                        }
+                    ],
+                    "severity": [
+                        {
+                            "type": "CVSS_V3",
+                            "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+                            "baseScore": 7.5,
+                            "ranking": "High"
+                        }
+                    ],
+                    "fixed": "10.1.16",
+                    "database_specific": {
+                        "severity": "HIGH",
+                        "github_reviewed_at": "2023-11-28T23:28:54Z",
+                        "github_reviewed": true,
+                        "cwe_ids": [
+                            "CWE-20",
+                            "CWE-444"
+                        ],
+                        "nvd_published_at": "2023-11-28T16:15:06Z"
+                    },
+                    "schema_version": "1.6.0"
+                }
+            ]
+        }
+    ],
+    "ecosystem": "Maven",
+    "issuesCount": 1,
+    "libraryCount": 1,
+    "includeSafe": true,
+    "responseTime": 15
+}
