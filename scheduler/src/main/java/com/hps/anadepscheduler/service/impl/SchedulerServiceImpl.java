@@ -131,7 +131,6 @@ public class SchedulerServiceImpl implements SchedulerService {
                         log.info("Handling file: {}, with size {} bytes", file.getName(), file.length());
                         return handlingVulnerability(file);
                     } catch (Exception exc) {
-                        log.error("Failing file: {}, with message: {}", file.getName(), exc.getMessage());
                         return null;
                     }
                 }, executorService))
@@ -141,10 +140,12 @@ public class SchedulerServiceImpl implements SchedulerService {
                 .toList();
 
         summaryResults.forEach(r -> {
-            summaryResult.setVulnerabilityCount(summaryResult.getVulnerabilityCount() + r.getVulnerabilityCount());
-            summaryResult.setDependencyCount(summaryResult.getDependencyCount() + r.getDependencyCount());
-            summaryResult.setSuccess(summaryResult.getSuccess() + r.getSuccess());
-            summaryResult.setFail(summaryResult.getFail() + r.getFail());
+            if (r != null) {
+                summaryResult.setVulnerabilityCount(summaryResult.getVulnerabilityCount() + r.getVulnerabilityCount());
+                summaryResult.setDependencyCount(summaryResult.getDependencyCount() + r.getDependencyCount());
+                summaryResult.setSuccess(summaryResult.getSuccess() + r.getSuccess());
+                summaryResult.setFail(summaryResult.getFail() + r.getFail());
+            }
         });
 
         executorService.shutdown();
@@ -214,8 +215,9 @@ public class SchedulerServiceImpl implements SchedulerService {
             log.info("Completing file: {}", file.getName());
             return summaryResult;
         } catch (Exception exc) {
+            log.error("Failing file: {}, with message: {}", file.getName(), exc.getMessage());
             summaryResult.setFail(summaryResult.getFail() + 1);
-            throw new RuntimeException(exc.getMessage());
+            return summaryResult;
         }
     }
 

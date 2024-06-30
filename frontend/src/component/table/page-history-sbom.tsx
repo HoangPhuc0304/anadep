@@ -46,7 +46,7 @@ export default function HistorySbomPage({
                     <TabsTrigger value="details">Details</TabsTrigger>
                 </TabsList>
                 <TabsContent value="summary">
-                    <ScrollArea className="h-[640px] w-full px-4">
+                    <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 236px)"}}>
                         <div className="grid grid-cols-2 gap-2">
                             <Card className="">
                                 <CardHeader>
@@ -178,7 +178,7 @@ export default function HistorySbomPage({
                     </ScrollArea>
                 </TabsContent>
                 <TabsContent value="details">
-                    <ScrollArea className="h-[640px] w-full px-4">
+                    <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 236px)"}}>
                         {repoData?.scanningResult?.libraries && (
                             <DataTable
                                 data={repoData?.scanningResult?.libraries}

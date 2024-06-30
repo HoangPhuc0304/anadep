@@ -92,7 +92,7 @@ export default function SearchingPage({
 
     return (
         <div className="mx-auto relative z-0">
-            <ScrollArea className="h-[640px] w-full px-4">
+            <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 210px)"}}>
                 {loading ? (
                     <DataTable
                         data={analysisUIResult.libs}

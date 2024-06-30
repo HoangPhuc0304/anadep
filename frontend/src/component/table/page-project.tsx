@@ -123,7 +123,7 @@ export default function ProjectPage() {
                 </AlertDialogContent>
             </AlertDialog>
 
-            <ScrollArea className="h-[640px] w-full px-4">
+            <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 190px)"}}>
                 {loading ? (
                     <DataTable
                         data={projects}

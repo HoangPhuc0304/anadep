@@ -140,7 +140,7 @@ export default function SbomPage({
 
     return (
         <div className="mx-auto">
-            <ScrollArea className="h-[640px] w-full px-4">
+            <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 210px)"}}>
                 {loading ? (
                     <DataTable
                         data={scanningResult.libraries}

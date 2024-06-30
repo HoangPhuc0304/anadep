@@ -130,7 +130,7 @@ export default function HistoryVulnsPage({
                     <TabsTrigger value="details">Details</TabsTrigger>
                 </TabsList>
                 <TabsContent value="summary">
-                    <ScrollArea className="h-[640px] w-full px-4">
+                    <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 236px)"}}>
                         <div className="grid grid-cols-3 gap-3">
                             <Card className="">
                                 <CardHeader>
@@ -457,7 +457,7 @@ export default function HistoryVulnsPage({
                     </ScrollArea>
                 </TabsContent>
                 <TabsContent value="details">
-                    <ScrollArea className="h-[640px] w-full px-4">
+                    <ScrollArea className="w-full px-4 mb-4" style={{height: "calc(100vh - 236px)"}}>
                         {repoData?.vulnerabilityResult?.libs && (
                             <DataTable
                                 data={repoData?.vulnerabilityResult?.libs}
