@@ -106,7 +106,7 @@ jobs:
         if: always()
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
-          webhook-url: https://studenthcmusedu.webhook.office.com/webhookb2/012a4bf5-a7bb-4f11-8d62-63d54e2dff89@40127cd4-45f3-49a3-b05d-315a43a9f033/IncomingWebhook/426987ddf0bf48f9a385ec7dbe395ef3/882a1006-7916-4b5e-a218-2e34bbdb523e/V2556zbF94MNXYdR0p6CM-wKvuVjnKj04z9BzoyiCNXhk1
+          webhook-url: ${{ env.WORKFLOWS_URL }}
           deploy-card: true
           title: 'Schedule Test Failed'
           color: 'failure'
