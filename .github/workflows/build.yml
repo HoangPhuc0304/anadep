@@ -18,7 +18,7 @@ env:
   REACT_APP_ENABLE_ANADEP_DB: true
   REACT_APP_AUTH_GITHUB_APP: https://github.com/apps/anadep-auth-app
   DEV_TOOLS: false
-  WORKFLOWS_URL: https://prod-05.southeastasia.logic.azure.com:443/workflows/c3b587c5f4e3425f82ed17f2072501ff/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=HP7pLTtXcwE4ywiRpu9UFMuy_QwKxA5H7Ico4hf6YM8
+  WORKFLOWS_URL: https://prod-41.southeastasia.logic.azure.com:443/workflows/5ccd660cf4a942fd8116775818cc73b4/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6ohNxQvl7xFmO0ltbx3w5dLUNSOed5Xdvrix6-GUSjo
 
 permissions:
   contents: read
