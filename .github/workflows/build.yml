@@ -105,7 +105,7 @@ jobs:
         uses: skitionek/notify-microsoft-teams@master
         if: always()
         with:
-          webhook_url: ${{ env.WORKFLOWS_URL }}
+          webhook_url: https://prod-05.southeastasia.logic.azure.com:443/workflows/c3b587c5f4e3425f82ed17f2072501ff/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=HP7pLTtXcwE4ywiRpu9UFMuy_QwKxA5H7Ico4hf6YM8
           needs: ${{ toJson(needs) }}
           job: ${{ toJson(job) }}
           steps: ${{ toJson(steps) }}
