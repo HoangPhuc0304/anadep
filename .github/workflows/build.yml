@@ -102,7 +102,7 @@ jobs:
       #     echo "image=$ECR_REGISTRY/$ANADEP_SCHEDULER_ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
       
       - name: Microsoft Teams Notification
-        uses: toko-bifrost/ms-teams-deploy-card@master
+        uses: opsless/ms-teams-github-actions@main
         if: always()
         with:
           github-token: ${{ github.token }} # this will use the runner's token.
